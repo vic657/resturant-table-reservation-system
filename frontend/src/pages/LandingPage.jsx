@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Button from "../Components/ui/Button";
 import "../index.css";
+import Navbar from "../Components/Navbar";
 import { FaFacebookF, FaInstagram, FaTwitter, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 
 import r1 from "../assets/r1.jpg";
@@ -27,17 +29,7 @@ export default function LandingPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col">
-      {/* Navbar */}
-      <nav>
-        <h1>VC'RestaurantSystem</h1>
-        <ul>
-          <li><a href="#home">Home</a></li>
-          <li><a href="#menu">Menu</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-        <button>Login</button>
-      </nav>
+      <Navbar /> 
 
       {/* Hero Section */}
       <section id="home" className="hero">
@@ -54,9 +46,11 @@ export default function LandingPage() {
             Experience the best dining with our handcrafted dishes and excellent service.
           </p>
           <div className="hero-buttons">
+          <Link to="/book-table">
             <button className="primary">Book a Table</button>
-            <button className="outline">Order Online</button>
-          </div>
+          </Link>
+          <button className="outline">Order Online</button>
+        </div>
         </motion.div>
 
         <motion.img
