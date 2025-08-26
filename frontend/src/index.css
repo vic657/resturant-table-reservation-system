@@ -684,4 +684,130 @@ footer a:hover {
     font-size: 1.2rem;
   }
 }
+/*user icon admin*/
+.user-menu {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.user-icon {
+  font-size: 2rem;
+  color: white;
+}
+
+.dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  color: #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  padding: 10px;
+  min-width: 150px;
+  text-align: left;
+  z-index: 100;
+}
+
+.dropdown-username {
+  margin: 0 0 8px;
+  font-weight: bold;
+  color: #e74c3c; /* red/orange feel */
+}
+
+.dropdown-logout {
+  background: #e74c3c;
+  border: none;
+  padding: 6px 12px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.dropdown-logout:hover {
+  background: #c0392b;
+}
+
+/* ===== Login Modal Styling ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff8f0;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 380px;
+  position: relative;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  border-top: 5px solid #e63946; /* red top border */
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #333;
+}
+
+.modal-title {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #e63946;
+}
+
+.modal-error {
+  color: #e63946;
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  font-size: 1rem;
+}
+
+.modal-input:focus {
+  border-color: #ff8800; /* orange focus */
+  box-shadow: 0 0 4px rgba(255,136,0,0.5);
+}
+
+.modal-button {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(45deg, #ff8800, #ffcc00);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.modal-button:hover {
+  background: linear-gradient(45deg, #e63946, #ff8800);
+}
 
