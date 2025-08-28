@@ -1,5 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
+import axiosClient from "../axiosClient";
+
 import { useNavigate } from "react-router-dom";
 
 function Login() {
@@ -11,10 +12,8 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/login", {
-        email,
-        password,
-      });
+     const res = await axiosClient.post("/login", { email, password });
+
 
       // store token
       localStorage.setItem("token", res.data.token);

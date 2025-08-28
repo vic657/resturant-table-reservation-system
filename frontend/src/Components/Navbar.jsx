@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // 👈 import navigate
 import "../index.css";
 import LoginModal from "./LoginModal";
+import { FaUserCircle } from "react-icons/fa"; // 👈 for user icon
 
 export default function Navbar() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 👈 initialize navigate
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(storedUser);
     }
   }, []);
 
@@ -20,7 +21,7 @@ export default function Navbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-    navigate("/"); // redirect to landing page
+    navigate("/"); // 👈 now it works
   };
 
   return (
@@ -34,6 +35,7 @@ export default function Navbar() {
           <li><a href="#contact">Contact</a></li>
         </ul>
 
+        {/* Right side */}
         {!user ? (
           <button
             className="navbar-btn"
@@ -43,41 +45,16 @@ export default function Navbar() {
           </button>
         ) : (
           <div
-            className="user-dropdown"
+            className="user-menu"
             onMouseEnter={() => setDropdownOpen(true)}
             onMouseLeave={() => setDropdownOpen(false)}
-            style={{ position: "relative", cursor: "pointer" }}
           >
-            <span className="user-icon">👤</span>
+            <FaUserCircle className="user-icon" />
+
             {dropdownOpen && (
-              <div
-                className="dropdown-menu"
-                style={{
-                  position: "absolute",
-                  right: 0,
-                  top: "100%",
-                  background: "#fff",
-                  border: "1px solid #ddd",
-                  borderRadius: "6px",
-                  padding: "10px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                  zIndex: 100,
-                }}
-              >
-                <p style={{ margin: "5px 0" }}>
-                  {user.name || user.email}
-                </p>
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    background: "#e74c3c",
-                    color: "#fff",
-                    border: "none",
-                    padding: "6px 12px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
+              <div className="dropdown">
+                <p className="dropdown-username">{user.name}</p>
+                <button className="dropdown-logout" onClick={handleLogout}>
                   Logout
                 </button>
               </div>
@@ -86,15 +63,8 @@ export default function Navbar() {
         )}
       </nav>
 
-      {isLoginOpen && (
-        <LoginModal
-          onClose={() => {
-            setIsLoginOpen(false);
-            const storedUser = localStorage.getItem("user");
-            if (storedUser) setUser(JSON.parse(storedUser));
-          }}
-        />
-      )}
+      {/* Login Modal */}
+      {isLoginOpen && <LoginModal onClose={() => setIsLoginOpen(false)} />}
     </>
   );
 }

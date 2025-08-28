@@ -810,4 +810,244 @@ footer a:hover {
 .modal-button:hover {
   background: linear-gradient(45deg, #e63946, #ff8800);
 }
+/* Admin Layout */
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  background: #f8f9fa;
+}
 
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  height: calc(100vh - 60px); /* below navbar */
+  background: linear-gradient(180deg, red, orange, yellow);
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 60px; /* start just after navbar */
+  left: 0;
+  overflow-y: auto;
+}
+
+/* Sidebar links */
+.sidebar a {
+  display: block;
+  padding: 10px 0;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+.sidebar a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  padding-left: 8px;
+}
+
+/* Main content */
+.admin-content {
+  margin-left: 250px; /* push aside sidebar */
+  margin-top: 60px;   /* push below navbar */
+  padding: 20px;
+  flex: 1;
+  background: #f8f9fa;
+  min-height: calc(100vh - 60px);
+}
+.sidebar ul {
+  list-style: none;   /* removes bullets */
+  padding: 0;         /* removes left padding */
+  margin: 0;          /* removes top margin */
+}
+
+.sidebar li {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;  /* space between icon and text */
+}
+
+/* Logout Button */
+.sidebar-logout {
+  background: #fff;
+  color: red;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar-logout:hover {
+  background: #333;
+  color: yellow;
+}
+
+/* Header */
+.admin-header {
+  background: #fff;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #eee;
+}
+
+.toggle-btn {
+  background: red;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.toggle-btn:hover {
+  background: orange;
+}
+
+.admin-main {
+  padding: 20px;
+}
+/*support staff*/
+.sidebar-dropdown {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.sidebar-submenu {
+  list-style: none;
+  padding-left: 20px;
+  
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between icon and text */
+  padding: 10px 15px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+}
+
+.sidebar ul li i {
+  margin: 0; /* remove big margins on icon */
+  font-size: 18px;
+}
+
+.sidebar ul li span {
+  margin: 0; /* remove extra spacing */
+}
+
+
+.sidebar-submenu li a:hover {
+ 
+  color: #fff;
+}
+/*waitersjsx css*/
+.waiters-container {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #fff8f0; /* soft warm background */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  border: 2px solid #ff6f3c; /* orange border */
+}
+
+h2 {
+  margin-bottom: 15px;
+  text-align: center;
+  color: #d62828; /* strong red */
+}
+
+.message {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}
+.message.success {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+.message.error {
+  background: #f8d7da;
+  color: #a71d2a;
+  border: 1px solid #f5c6cb;
+}
+
+.waiter-form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+.waiter-form input {
+  padding: 10px;
+  border: 1px solid #ffb703; /* yellow border */
+  border-radius: 4px;
+  background: #fff;
+}
+.waiter-form input:focus {
+  outline: none;
+  border-color: #fb8500; /* orange focus */
+  box-shadow: 0 0 5px rgba(251, 133, 0, 0.5);
+}
+.waiter-form button {
+  padding: 10px;
+  background: linear-gradient(45deg, #d62828, #f77f00); /* red → orange */
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.waiter-form button:hover {
+  background: linear-gradient(45deg, #b22222, #e85d04); /* darker red-orange */
+}
+
+h3 {
+  margin-bottom: 10px;
+  color: #d62828;
+}
+
+.waiters-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.waiters-table th,
+.waiters-table td {
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  text-align: left;
+}
+.waiters-table th {
+  background: #ffb703; /* golden yellow header */
+  color: #fff;
+}
+.waiters-table tr:nth-child(even) {
+  background: #fff3e0; /* light orange row */
+}
+
+.empty {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}

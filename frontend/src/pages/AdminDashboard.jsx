@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
+import SidebarLayout from "../pages/Sidebar.jsx";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -14,9 +15,17 @@ function AdminDashboard() {
 
   return (
     <>
+      {/* Top Navbar */}
       <Navbar />
-      <div className="dashboard-container">
-        <h1>Welcome Admin Dashboard</h1>
+
+      {/* Sidebar + Content */}
+      <div style={{ display: "flex" }}>
+        <SidebarLayout>
+          <div className="dashboard-content" style={{ padding: "20px" }}>
+            <h1>Welcome Admin Dashboard</h1>
+            <p>Here you can manage users, view reports, and configure system settings.</p>
+          </div>
+        </SidebarLayout>
       </div>
     </>
   );
