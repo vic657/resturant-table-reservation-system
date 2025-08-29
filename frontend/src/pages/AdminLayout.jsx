@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../index.css";
-import { FaBars, FaTachometerAlt, FaUsers, FaUtensils, FaCog, FaSignOutAlt } from "react-icons/fa";
+import Navbar from "../Components/Navbar.jsx";       // Top Navbar
+import Sidebar from "../Pages/Sidebar.jsx";         // Sidebar from pages
 
 export default function AdminLayout({ children }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -8,24 +9,12 @@ export default function AdminLayout({ children }) {
   return (
     <div className="admin-container">
       {/* Sidebar */}
-      <div className={`sidebar ${isOpen ? "open" : "collapsed"}`}>
-        <h2 className="sidebar-logo">Admin</h2>
-        <ul className="sidebar-links">
-          <li><FaTachometerAlt /> Dashboard</li>
-          <li><FaUsers /> Manage Users</li>
-          <li><FaUtensils /> Manage Menu</li>
-          <li><FaCog /> Settings</li>
-          <li><FaSignOutAlt /> Logout</li>
-        </ul>
-      </div>
+      <Sidebar isOpen={isOpen} />
 
       {/* Main content */}
       <div className="main-content">
-        {/* Topbar */}
-        <div className="topbar">
-          <FaBars className="menu-toggle" onClick={() => setIsOpen(!isOpen)} />
-          <h1>Admin Panel</h1>
-        </div>
+        {/* Top Navbar */}
+        <Navbar toggleSidebar={() => setIsOpen(!isOpen)} />
 
         {/* Page Content */}
         <div className="page-content">{children}</div>
