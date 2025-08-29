@@ -4,6 +4,7 @@ import BookTable from "./pages/BookTable.jsx";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import Waiters from "./pages/Waiters";
+import Security from "./pages/Security";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         {/* Waiters Page (accessible via both URLs) */}
         <Route path="/waiters" element={<Waiters />} />
         <Route path="/admin/support/waiters" element={<Waiters />} />
+        <Route path="/admin/security" element={<Security />} />
 
         {/* Book a Table Page */}
         <Route path="/book-table" element={<BookTable />} />

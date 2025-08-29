@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from './AdminLayout';
 import axiosClient from "../axiosClient";
-import "../index.css"; // ✅ Import CSS file
+import "../index.css"; 
 
 export default function Waiters() {
   const [waiters, setWaiters] = useState([]);
