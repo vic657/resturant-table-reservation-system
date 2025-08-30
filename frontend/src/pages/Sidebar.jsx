@@ -37,7 +37,7 @@ export default function Sidebar({ onLogout }) {
                 <Link to="/admin/security">Security</Link>
               </li>
               <li>
-                <Link to="/accountant">Accountant</Link>
+                <Link to="/admin/accountant">Accountant</Link>
               </li>
             </ul>
           )}

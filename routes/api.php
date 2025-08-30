@@ -5,6 +5,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\WaiterController;
 use App\Http\Controllers\Admin\SecurityController;
+use App\Http\Controllers\Admin\AccountantController;
 
 // Public routes
 Route::post('/book-table', [BookingController::class, 'store']);
@@ -18,5 +19,9 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::get('/securities/{id}', [SecurityController::class, 'show']);
     Route::put('/securities/{id}', [SecurityController::class, 'update']);
     Route::delete('/securities/{id}', [SecurityController::class, 'destroy']);
+    Route::get('/accountant', [AccountantController::class, 'index']);   
+    Route::post('/accountant', [AccountantController::class, 'store']);  
+    Route::put('/accountant/{id}', [AccountantController::class, 'update']); 
+    Route::delete('/accountant/{id}', [AccountantController::class, 'destroy']); 
 });
 
