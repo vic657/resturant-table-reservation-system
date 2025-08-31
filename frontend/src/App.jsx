@@ -6,6 +6,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Waiters from "./pages/Waiters";
 import Security from "./pages/Security";
 import Accountant from "./pages/Accountant";
+import KitchenManager from "./pages/KitchenManager";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/admin/support/waiters" element={<Waiters />} />
         <Route path="/admin/security" element={<Security />} />
         <Route path="/admin/accountant" element={<Accountant />} />
+        <Route path="/admin/kitchen-manager" element={<KitchenManager />} />
 
         {/* Book a Table Page */}
         <Route path="/book-table" element={<BookTable />} />

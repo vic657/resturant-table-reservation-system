@@ -39,6 +39,12 @@ export default function Sidebar({ onLogout }) {
               <li>
                 <Link to="/admin/accountant">Accountant</Link>
               </li>
+              <li>
+              <Link to="/admin/kitchen-manager" className="sidebar-link">
+               Kitchen Manager
+            </Link>
+            </li>
+
             </ul>
           )}
         </li>
