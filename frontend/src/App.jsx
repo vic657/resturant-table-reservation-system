@@ -7,6 +7,12 @@ import Waiters from "./pages/Waiters";
 import Security from "./pages/Security";
 import Accountant from "./pages/Accountant";
 import KitchenManager from "./pages/KitchenManager";
+import KitchenManagerDashboard from "./pages/KitchenManagerDashboard";
+
+// ✅ Import dashboards
+import WaiterDashboard from "./pages/WaiterDashboard";
+import SecurityDashboard from "./pages/SecurityDashboard";
+import AccountantDashboard from "./pages/AccountantDashboard";
 
 function App() {
   return (
@@ -17,14 +23,20 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
-        {/* Waiters Page (accessible via both URLs) */}
+        {/* Admin Support Pages */}
         <Route path="/waiters" element={<Waiters />} />
         <Route path="/admin/support/waiters" element={<Waiters />} />
         <Route path="/admin/security" element={<Security />} />
         <Route path="/admin/accountant" element={<Accountant />} />
         <Route path="/admin/kitchen-manager" element={<KitchenManager />} />
 
-        {/* Book a Table Page */}
+        {/* Individual Dashboards */}
+        <Route path="/kitchen-manager/dashboard" element={<KitchenManagerDashboard />} />
+        <Route path="/waiter/dashboard" element={<WaiterDashboard />} />
+        <Route path="/security/dashboard" element={<SecurityDashboard />} />
+        <Route path="/accountant/dashboard" element={<AccountantDashboard />} />
+
+        {/* Public Page */}
         <Route path="/book-table" element={<BookTable />} />
       </Routes>
     </Router>

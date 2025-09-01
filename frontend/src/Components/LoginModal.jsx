@@ -17,13 +17,24 @@ function LoginModal({ onClose }) {
         password,
       });
 
+      // Save token + user + role
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("role", res.data.role);
 
-      if (res.data.user.role === "admin") {
+      // Decide redirect based on role
+      if (res.data.role === "admin") {
         navigate("/admin/dashboard");
+      } else if (res.data.role === "kitchen_manager") {
+        navigate("/kitchen-manager/dashboard");
+      } else if (res.data.role === "waiter") {
+        navigate("/waiter/dashboard");
+      } else if (res.data.role === "security") {
+        navigate("/security/dashboard");
+      } else if (res.data.role === "accountant") {
+        navigate("/accountant/dashboard");
       } else {
-        navigate("/");
+        navigate("/"); // fallback regular user
       }
 
       onClose();
