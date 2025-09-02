@@ -7,12 +7,17 @@ use App\Http\Controllers\Admin\WaiterController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\AccountantController;
 use App\Http\Controllers\KitchenManagerController;
+use App\Http\Controllers\MenuController;
 
+// ==========================
 // Public routes
+// ==========================
 Route::post('/book-table', [BookingController::class, 'store']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Kitchen Manager routes (separate prefix)
+// ==========================
+// Kitchen Manager routes
+// ==========================
 Route::prefix('kitchen-managers')->group(function () {
     Route::post('/', [KitchenManagerController::class, 'store']);   // POST api/kitchen-managers
     Route::get('/', [KitchenManagerController::class, 'index']);   // GET api/kitchen-managers
@@ -20,7 +25,19 @@ Route::prefix('kitchen-managers')->group(function () {
     Route::delete('/{id}', [KitchenManagerController::class, 'destroy']); // DELETE api/kitchen-managers/{id}
 });
 
-// Protected admin routes
+// ==========================
+// Menu routes (for Kitchen Manager)
+// ==========================
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/menus', [MenuController::class, 'index']);
+    Route::post('/menus', [MenuController::class, 'store']);
+    Route::put('/menus/{menu}', [MenuController::class, 'update']);
+    Route::delete('/menus/{menu}', [MenuController::class, 'destroy']);
+});
+
+// ==========================
+// Admin routes
+// ==========================
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::apiResource('waiters', WaiterController::class);
 
@@ -34,9 +51,4 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::post('/accountant', [AccountantController::class, 'store']);  
     Route::put('/accountant/{id}', [AccountantController::class, 'update']); 
     Route::delete('/accountant/{id}', [AccountantController::class, 'destroy']);
-
-    Route::get('/menu-items', [MenuItemController::class, 'index']);
-    Route::post('/menu-items', [MenuItemController::class, 'store']);
-    Route::put('/menu-items/{menuItem}', [MenuItemController::class, 'update']);
-    Route::delete('/menu-items/{menuItem}', [MenuItemController::class, 'destroy']);
 });

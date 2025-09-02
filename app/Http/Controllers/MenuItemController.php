@@ -2,66 +2,58 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MenuItem;
+use App\Models\Menu;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
-class MenuItemController extends Controller
+class MenuController extends Controller
 {
     public function index()
     {
-        return response()->json(MenuItem::all());
+        return response()->json(Menu::all());
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'category' => 'required|string',
-            'price' => 'required|numeric',
-            'image' => 'nullable|image|max:2048',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string',
+        'category' => 'required|in:drinks,beverages,foods,snacks',
+        'price' => 'required|numeric',
+        'description' => 'nullable|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        $path = $request->file('image')?->store('menu', 'public');
+    $data = $request->only(['name', 'category', 'price', 'description']);
 
-        $menuItem = MenuItem::create([
-            'name' => $request->name,
-            'category' => $request->category,
-            'price' => $request->price,
-            'image' => $path,
-        ]);
-
-        return response()->json($menuItem, 201);
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('menu_images', 'public');
+        $data['image'] = $imagePath;
     }
 
-    public function update(Request $request, MenuItem $menuItem)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'category' => 'required|string',
-            'price' => 'required|numeric',
-            'image' => 'nullable|image|max:2048',
-        ]);
+    $menu = Menu::create($data);
 
-        if ($request->hasFile('image')) {
-            if ($menuItem->image) {
-                Storage::disk('public')->delete($menuItem->image);
-            }
-            $menuItem->image = $request->file('image')->store('menu', 'public');
-        }
-
-        $menuItem->update($request->only(['name','category','price']));
-
-        return response()->json($menuItem);
-    }
-
-    public function destroy(MenuItem $menuItem)
-    {
-        if ($menuItem->image) {
-            Storage::disk('public')->delete($menuItem->image);
-        }
-        $menuItem->delete();
-        return response()->json(['message' => 'Menu item deleted']);
-    }
+    return response()->json($menu, 201);
 }
 
+public function update(Request $request, Menu $menu)
+{
+    $request->validate([
+        'name' => 'required|string',
+        'category' => 'required|in:drinks,beverages,foods,snacks',
+        'price' => 'required|numeric',
+        'description' => 'nullable|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    $data = $request->only(['name', 'category', 'price', 'description']);
+
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('menu_images', 'public');
+        $data['image'] = $imagePath;
+    }
+
+    $menu->update($data);
+
+    return response()->json($menu);
+}
+
+}
