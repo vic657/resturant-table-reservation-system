@@ -73,5 +73,17 @@ public function update(Request $request, Menu $menu)
 
     return response()->json($menu);
 }
+public function destroy(Menu $menu)
+{
+    // Delete the image file if exists
+    if ($menu->image && file_exists(public_path($menu->image))) {
+        unlink(public_path($menu->image));
+    }
+
+    $menu->delete();
+
+    return response()->json(['message' => 'Menu deleted successfully']);
+}
+
 
 }
