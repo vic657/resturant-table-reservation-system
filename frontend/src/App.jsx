@@ -8,6 +8,8 @@ import Security from "./pages/Security";
 import Accountant from "./pages/Accountant";
 import KitchenManager from "./pages/KitchenManager";
 import KitchenManagerDashboard from "./pages/KitchenManagerDashboard";
+import Menu from "./Pages/Menu";
+import Receipt from "./pages/Receipt";
 
 // ✅ Import dashboards
 import WaiterDashboard from "./pages/WaiterDashboard";
@@ -38,6 +40,8 @@ function App() {
 
         {/* Public Page */}
         <Route path="/book-table" element={<BookTable />} />
+        <Route path="/menu" element={<Menu />} />
+        <Route path="/receipt/:receiptCode" element={<Receipt />} />
       </Routes>
     </Router>
   );

@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../index.css";
 import Navbar from "../Components/Navbar";
 
 export default function BookTable() {
-  const [area, setArea] = useState("indoor"); 
+  const navigate = useNavigate();
+  const [area, setArea] = useState("indoor");
   const [selectedTables, setSelectedTables] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -11,6 +13,8 @@ export default function BookTable() {
     email: "",
     phone: "",
     guests: "",
+    date: "",
+    time: "",
   });
   const [message, setMessage] = useState(null);
 
@@ -18,6 +22,11 @@ export default function BookTable() {
   const outdoorTables = Array.from({ length: 10 }, (_, i) => i + 1);
 
   const toggleTable = (type, number) => {
+    // Prevent table selection if date/time not chosen
+    if (!formData.date || !formData.time) {
+      setMessage({ type: "error", text: "Please select a date and time first." });
+      return;
+    }
     const key = `${type}-${number}`;
     setSelectedTables((prev) =>
       prev.includes(key) ? prev.filter((t) => t !== key) : [...prev, key]
@@ -40,21 +49,51 @@ export default function BookTable() {
   };
 
   const confirmBooking = () => {
-    if (!formData.name || !formData.email || !formData.phone || !formData.guests) {
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.guests ||
+      !formData.date ||
+      !formData.time
+    ) {
       setMessage({ type: "error", text: "Please fill in all fields." });
       return;
     }
 
-    setMessage({
-      type: "success",
-      text: `Booking confirmed for tables: ${selectedTables.join(", ")}`,
+    const pendingBooking = {
+      tables: selectedTables,
+      customer: {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        guests: formData.guests,
+        date: formData.date,
+        time: formData.time,
+      },
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      localStorage.setItem("pendingBooking", JSON.stringify(pendingBooking));
+    } catch (err) {
+      console.error("Failed to save pending booking:", err);
+      setMessage({ type: "error", text: "Unable to proceed. Try again." });
+      return;
+    }
+
+    setShowForm(false);
+    setSelectedTables([]);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      guests: "",
+      date: "",
+      time: "",
     });
 
-    setSelectedTables([]);
-    setFormData({ name: "", email: "", phone: "", guests: "" });
-    setShowForm(false);
-
-    setTimeout(() => setMessage(null), 3000);
+    navigate("/menu");
   };
 
   return (
@@ -64,7 +103,32 @@ export default function BookTable() {
         Book <span>Your Table</span>
       </h2>
 
-      {/* area selection */}
+      {/* Step 1: Date & Time selection */}
+      <div className="date-time-selection" style={{ marginBottom: "20px", textAlign: "center" }}>
+        <input
+          type="date"
+          name="date"
+          value={formData.date || ""}
+          onChange={handleChange}
+          style={{ padding: "10px", marginRight: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
+        />
+        <input
+          type="time"
+          name="time"
+          value={formData.time || ""}
+          onChange={handleChange}
+          style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
+        />
+      </div>
+
+      {/* Show warning if date/time not selected */}
+      {(!formData.date || !formData.time) && (
+        <p style={{ color: "red", textAlign: "center", marginBottom: "20px" }}>
+          Please select a date and time before choosing tables.
+        </p>
+      )}
+
+      {/* Area selection */}
       <div className="area-selection">
         <button
           className={area === "indoor" ? "active" : ""}
@@ -133,9 +197,7 @@ export default function BookTable() {
                 return (
                   <div
                     key={key}
-                    className={`garden-table table-${num} ${
-                      isSelected ? "selected" : ""
-                    }`}
+                    className={`garden-table table-${num} ${isSelected ? "selected" : ""}`}
                     onClick={() => toggleTable("outdoor", num)}
                   >
                     <span className="chair top" />
@@ -184,7 +246,7 @@ export default function BookTable() {
         </div>
       )}
 
-      {/* Modal for booking form */}
+      {/* Modal for booking form (unchanged) */}
       {showForm && (
         <div
           style={{
@@ -270,8 +332,42 @@ export default function BookTable() {
                 border: "1px solid #ccc",
               }}
             />
+            <input
+              type="date"
+              name="date"
+              placeholder="Booking Date"
+              value={formData.date || ""}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                marginBottom: "10px",
+                padding: "10px",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+              }}
+            />
+            <input
+              type="time"
+              name="time"
+              placeholder="Booking Time"
+              value={formData.time || ""}
+              onChange={handleChange}
+              style={{
+                width: "100%",
+                marginBottom: "15px",
+                padding: "10px",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+              }}
+            />
 
-            <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "10px",
+              }}
+            >
               <button
                 onClick={confirmBooking}
                 style={{
@@ -283,7 +379,7 @@ export default function BookTable() {
                   cursor: "pointer",
                 }}
               >
-                Confirm Booking
+                Make Your Orders
               </button>
               <button
                 onClick={() => setShowForm(false)}

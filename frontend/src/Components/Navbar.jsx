@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // 👈 import navigate
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import "../index.css";
 import LoginModal from "./LoginModal";
-import { FaUserCircle } from "react-icons/fa"; // 👈 for user icon
+import { FaUserCircle } from "react-icons/fa";
 
 export default function Navbar() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate(); // 👈 initialize navigate
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -21,7 +22,26 @@ export default function Navbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-    navigate("/"); // 👈 now it works
+    navigate("/");
+  };
+
+  const scrollToSection = (id) => {
+    if (location.pathname === "/") {
+      // already on home → smooth scroll
+      const section = document.getElementById(id);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // not on home → go to home then scroll
+      navigate("/");
+      setTimeout(() => {
+        const section = document.getElementById(id);
+        if (section) {
+          section.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 300);
+    }
   };
 
   return (
@@ -29,18 +49,33 @@ export default function Navbar() {
       <nav className="navbar">
         <h1 className="navbar-logo">VC'RestaurantSystem</h1>
         <ul className="navbar-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="#menu">Menu</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/menu">Menu</Link>
+          </li>
+          <li>
+            <button
+              onClick={() => scrollToSection("about")}
+              className="navbar-link-btn"
+            >
+              About
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => scrollToSection("contact")}
+              className="navbar-link-btn"
+            >
+              Contact
+            </button>
+          </li>
         </ul>
 
         {/* Right side */}
         {!user ? (
-          <button
-            className="navbar-btn"
-            onClick={() => setIsLoginOpen(true)}
-          >
+          <button className="navbar-btn" onClick={() => setIsLoginOpen(true)}>
             Login
           </button>
         ) : (
@@ -63,7 +98,6 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* Login Modal */}
       {isLoginOpen && <LoginModal onClose={() => setIsLoginOpen(false)} />}
     </>
   );

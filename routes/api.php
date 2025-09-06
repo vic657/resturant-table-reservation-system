@@ -1,19 +1,30 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\WaiterController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\AccountantController;
 use App\Http\Controllers\KitchenManagerController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MenuShowController;
+use App\Http\Controllers\BookingController;
 
 // ==========================
 // Public routes
 // ==========================
 Route::post('/book-table', [BookingController::class, 'store']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/menu-show', [MenuShowController::class, 'index']);
+Route::post('/bookings', [BookingController::class, 'store']);
+Route::post('/book-table', [BookingController::class, 'store']);
+Route::get('/booked-tables', [BookingController::class, 'bookedTables']);
+Route::get('/bookings/booked-tables', [BookingController::class, 'bookedTables']);
+Route::get('/bookings/receipt/{code}', [BookingController::class, 'findByReceipt']);
+
+// NEW: Public menus route
+Route::get('/public-menus', [MenuController::class, 'publicIndex']);
+
 
 // ==========================
 // Kitchen Manager routes

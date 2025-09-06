@@ -342,6 +342,20 @@ footer a:hover {
 .outdoor-garden h3{
   color: #e65c00;
 }
+/* Booked table styling */
+.room-table.booked,
+.garden-table.booked {
+  background: #d3d3d3;   /* light gray to indicate booked */
+  color: #fff;
+  border-color: #999;
+  cursor: not-allowed;
+  transform: none;       /* prevent hover lift effect */
+}
+
+.room-table.booked:hover,
+.garden-table.booked:hover {
+  transform: none;       /* prevent hover scale */
+}
 
 /* room container (rectangular hall) */
 .room {
