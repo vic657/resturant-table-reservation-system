@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axiosClient from "../axiosClient";
 import "../index.css";
 import Navbar from "../Components/Navbar";
 
@@ -8,6 +9,7 @@ export default function BookTable() {
   const [area, setArea] = useState("indoor");
   const [selectedTables, setSelectedTables] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [bookedTables, setBookedTables] = useState([]); // ✅ store booked tables
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,13 +23,34 @@ export default function BookTable() {
   const indoorTables = Array.from({ length: 10 }, (_, i) => i + 1);
   const outdoorTables = Array.from({ length: 10 }, (_, i) => i + 1);
 
+  // ✅ Fetch booked tables when date changes (ignore time)
+  useEffect(() => {
+    if (formData.date) {
+      axiosClient
+        .post("/booked-tables", { date: formData.date }) // ✅ send only date
+        .then((res) => setBookedTables(res.data))
+        .catch((err) => {
+          console.error("Error fetching booked tables:", err);
+          setBookedTables([]);
+        });
+    } else {
+      setBookedTables([]);
+    }
+  }, [formData.date]);
+
   const toggleTable = (type, number) => {
-    // Prevent table selection if date/time not chosen
-    if (!formData.date || !formData.time) {
-      setMessage({ type: "error", text: "Please select a date and time first." });
+    if (!formData.date) {
+      setMessage({ type: "error", text: "Please select a date first." });
       return;
     }
     const key = `${type}-${number}`;
+
+    // Prevent selecting already booked tables
+    if (bookedTables.includes(key)) {
+      setMessage({ type: "error", text: `Table ${key} is already booked.` });
+      return;
+    }
+
     setSelectedTables((prev) =>
       prev.includes(key) ? prev.filter((t) => t !== key) : [...prev, key]
     );
@@ -63,14 +86,7 @@ export default function BookTable() {
 
     const pendingBooking = {
       tables: selectedTables,
-      customer: {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        guests: formData.guests,
-        date: formData.date,
-        time: formData.time,
-      },
+      customer: { ...formData },
       createdAt: new Date().toISOString(),
     };
 
@@ -104,27 +120,38 @@ export default function BookTable() {
       </h2>
 
       {/* Step 1: Date & Time selection */}
-      <div className="date-time-selection" style={{ marginBottom: "20px", textAlign: "center" }}>
+      <div
+        className="date-time-selection"
+        style={{ marginBottom: "20px", textAlign: "center" }}
+      >
         <input
           type="date"
           name="date"
           value={formData.date || ""}
           onChange={handleChange}
-          style={{ padding: "10px", marginRight: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
+          style={{
+            padding: "10px",
+            marginRight: "10px",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+          }}
         />
         <input
           type="time"
           name="time"
           value={formData.time || ""}
           onChange={handleChange}
-          style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
+          style={{
+            padding: "10px",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+          }}
         />
       </div>
 
-      {/* Show warning if date/time not selected */}
-      {(!formData.date || !formData.time) && (
+      {!formData.date && (
         <p style={{ color: "red", textAlign: "center", marginBottom: "20px" }}>
-          Please select a date and time before choosing tables.
+          Please select a date before choosing tables.
         </p>
       )}
 
@@ -157,10 +184,13 @@ export default function BookTable() {
               {indoorTables.map((num) => {
                 const key = `indoor-${num}`;
                 const isSelected = selectedTables.includes(key);
+                const isBooked = bookedTables.includes(key);
                 return (
                   <div
                     key={key}
-                    className={`room-table ${isSelected ? "selected" : ""}`}
+                    className={`room-table 
+                      ${isSelected ? "selected" : ""} 
+                      ${isBooked ? "booked" : ""}`}
                     onClick={() => toggleTable("indoor", num)}
                   >
                     <span className="chair top" />
@@ -194,10 +224,13 @@ export default function BookTable() {
               {outdoorTables.map((num) => {
                 const key = `outdoor-${num}`;
                 const isSelected = selectedTables.includes(key);
+                const isBooked = bookedTables.includes(key);
                 return (
                   <div
                     key={key}
-                    className={`garden-table table-${num} ${isSelected ? "selected" : ""}`}
+                    className={`garden-table table-${num} 
+                      ${isSelected ? "selected" : ""} 
+                      ${isBooked ? "booked" : ""}`}
                     onClick={() => toggleTable("outdoor", num)}
                   >
                     <span className="chair top" />
@@ -225,6 +258,7 @@ export default function BookTable() {
         <div className="legend">
           <span className="legend-pill available" /> Available
           <span className="legend-pill selected" /> Selected
+          <span className="legend-pill booked" /> Booked
         </div>
       </div>
 
@@ -246,7 +280,7 @@ export default function BookTable() {
         </div>
       )}
 
-      {/* Modal for booking form (unchanged) */}
+      {/* Modal */}
       {showForm && (
         <div
           style={{
