@@ -1,0 +1,81 @@
+.kitchen-container {
+  margin-left: 260px; /* same as sidebar width */
+  padding: 30px;
+  min-height: 100vh;
+  background-color: #fffaf5;
+}
+
+.kitchen-container h2 {
+  text-align: center;
+  color: red;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.kitchen-form {
+  max-width: 500px;
+  margin: 0 auto;
+  background: #fff8f0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.kitchen-form input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.kitchen-form button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  background: linear-gradient(to right, red, orange, gold);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.kitchen-form button:hover {
+  opacity: 0.9;
+}
+
+.kitchen-message {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.kitchen-message.error {
+  background-color: #ffe0e0;
+  color: red;
+}
+
+.kitchen-message.success {
+  background-color: #e6ffe6;
+  color: green;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .kitchen-container {
+    margin-left: 0;
+    padding: 20px;
+  }
+}

@@ -1065,3 +1065,16 @@ h3 {
   color: #888;
   font-style: italic;
 }
+/* Make sure dropdown appears on small screens */
+@media (max-width: 768px) {
+  .user-menu {
+    position: relative;
+  }
+  .dropdown {
+    top: 40px;
+    right: 0;
+    width: 160px;
+  }
+}
+
+

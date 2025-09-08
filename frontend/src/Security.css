@@ -1,0 +1,145 @@
+/* Container */
+.security-container {
+  padding: 20px;
+  background: #fff3e0;
+  min-height: 100vh;
+}
+
+/* Headings */
+.security-container h2 {
+  text-align: center;
+  color: #e65100;
+  margin-bottom: 20px;
+}
+
+/* Messages */
+.security-message {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  transition: opacity 0.5s ease-in-out;
+  text-align: center;
+  font-weight: 500;
+}
+
+.security-message.success {
+  background: #c8e6c9;
+  color: #256029;
+}
+
+.security-message.error {
+  background: #ffcdd2;
+  color: #c62828;
+}
+
+/* Form */
+.security-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #ffe0b2;
+  padding: 20px;
+  border-radius: 8px;
+  justify-content: center;
+}
+
+.security-form input,
+.security-form select {
+  flex: 1 1 200px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.security-form button {
+  background: #ff5722;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1 1 100px;
+}
+
+.security-form button:hover {
+  background: #e64a19;
+}
+
+/* Table */
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.security-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  min-width: 600px;
+}
+
+.security-table th,
+.security-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.security-table th {
+  background: #ffcc80;
+}
+
+.edit-btn {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background: #fb8c00;
+}
+
+.delete-btn:hover {
+  background: #d32f2f;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 20px;
+  color: #777;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .security-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .security-form input,
+  .security-form select,
+  .security-form button {
+    flex: 1 1 100%;
+  }
+
+  .security-table {
+    min-width: 100%;
+  }
+
+  .security-container {
+    padding: 15px;
+  }
+}

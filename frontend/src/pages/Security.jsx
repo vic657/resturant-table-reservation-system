@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axiosClient from "../axiosClient";
 import AdminLayout from "./AdminLayout";
+import "../Security.css"; // Import CSS for responsiveness
 
 export default function Security() {
   const [securities, setSecurities] = useState([]);
@@ -13,17 +14,16 @@ export default function Security() {
   });
   const [editingId, setEditingId] = useState(null);
 
-  // Success/Error messages
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch securities list
+  // Fetch security guards
   const fetchSecurities = async () => {
     try {
       const res = await axiosClient.get("/admin/securities");
       setSecurities(res.data);
     } catch (err) {
-      console.error("Error fetching securities:", err);
+      console.error(err);
       setErrorMessage("Failed to fetch security guards.");
     }
   };
@@ -32,7 +32,7 @@ export default function Security() {
     fetchSecurities();
   }, []);
 
-  // Auto-hide messages after 3 seconds
+  // Auto-hide messages
   useEffect(() => {
     if (successMessage || errorMessage) {
       const timer = setTimeout(() => {
@@ -43,17 +43,16 @@ export default function Security() {
     }
   }, [successMessage, errorMessage]);
 
-  // Handle input change
+  // Input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Add or update security guard
+  // Add/update guard
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccessMessage("");
     setErrorMessage("");
-
     try {
       if (editingId) {
         await axiosClient.put(`/admin/securities/${editingId}`, form);
@@ -66,12 +65,12 @@ export default function Security() {
       setEditingId(null);
       fetchSecurities();
     } catch (err) {
-      console.error("Error saving security:", err);
+      console.error(err);
       setErrorMessage("Failed to save security guard.");
     }
   };
 
-  // Edit security guard
+  // Edit guard
   const handleEdit = (security) => {
     setForm({
       name: security.name,
@@ -83,81 +82,31 @@ export default function Security() {
     setEditingId(security.id);
   };
 
-  // Delete security guard
+  // Delete guard
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this security guard?"))
       return;
-
     setSuccessMessage("");
     setErrorMessage("");
-
     try {
       await axiosClient.delete(`/admin/securities/${id}`);
       setSuccessMessage("Security guard deleted successfully!");
       fetchSecurities();
     } catch (err) {
-      console.error("Error deleting security:", err);
+      console.error(err);
       setErrorMessage("Failed to delete security guard.");
     }
   };
 
   return (
     <AdminLayout>
-      <div
-        style={{
-          padding: "20px",
-          background: "#fff3e0",
-          minHeight: "100vh",
-          marginLeft: "250px", // ✅ leave space for sidebar
-        }}
-      >
-        <h2 style={{ color: "#e65100", textAlign: "center" }}>
-          Security Guards Management
-        </h2>
+      <div className="security-container">
+        <h2>Security Guards Management</h2>
 
-        {/* Success Message */}
-        {successMessage && (
-          <div
-            style={{
-              background: "#c8e6c9",
-              color: "#256029",
-              padding: "10px",
-              marginBottom: "15px",
-              borderRadius: "5px",
-              transition: "opacity 0.5s ease-in-out",
-            }}
-          >
-            {successMessage}
-          </div>
-        )}
+        {successMessage && <div className="security-message success">{successMessage}</div>}
+        {errorMessage && <div className="security-message error">{errorMessage}</div>}
 
-        {/* Error Message */}
-        {errorMessage && (
-          <div
-            style={{
-              background: "#ffcdd2",
-              color: "#c62828",
-              padding: "10px",
-              marginBottom: "15px",
-              borderRadius: "5px",
-              transition: "opacity 0.5s ease-in-out",
-            }}
-          >
-            {errorMessage}
-          </div>
-        )}
-
-        {/* Security Form */}
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            marginTop: "20px",
-            marginBottom: "30px",
-            padding: "20px",
-            background: "#ffe0b2",
-            borderRadius: "8px",
-          }}
-        >
+        <form className="security-form" onSubmit={handleSubmit}>
           <input
             type="text"
             name="name"
@@ -165,7 +114,6 @@ export default function Security() {
             value={form.name}
             onChange={handleChange}
             required
-            style={{ marginRight: "10px", padding: "8px" }}
           />
           <input
             type="email"
@@ -174,7 +122,6 @@ export default function Security() {
             value={form.email}
             onChange={handleChange}
             required
-            style={{ marginRight: "10px", padding: "8px" }}
           />
           <input
             type="text"
@@ -183,15 +130,8 @@ export default function Security() {
             value={form.phone}
             onChange={handleChange}
             required
-            style={{ marginRight: "10px", padding: "8px" }}
           />
-          <select
-            name="shift"
-            value={form.shift}
-            onChange={handleChange}
-            required
-            style={{ marginRight: "10px", padding: "8px" }}
-          >
+          <select name="shift" value={form.shift} onChange={handleChange} required>
             <option value="">Select Shift</option>
             <option value="Day">Day Shift</option>
             <option value="Night">Night Shift</option>
@@ -203,95 +143,43 @@ export default function Security() {
             value={form.password}
             onChange={handleChange}
             required={!editingId}
-            style={{ marginRight: "10px", padding: "8px" }}
           />
-          <button
-            type="submit"
-            style={{
-              background: "#ff5722",
-              color: "white",
-              padding: "8px 16px",
-              border: "none",
-              borderRadius: "5px",
-            }}
-          >
-            {editingId ? "Update Guard" : "Add Guard"}
-          </button>
+          <button type="submit">{editingId ? "Update Guard" : "Add Guard"}</button>
         </form>
 
-        {/* Securities List */}
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            background: "white",
-          }}
-        >
-          <thead>
-            <tr style={{ background: "#ffcc80" }}>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Name</th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Email</th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Phone</th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Shift</th>
-              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {securities.map((security) => (
-              <tr key={security.id}>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {security.name}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {security.email}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {security.phone}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {security.shift}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  <button
-                    onClick={() => handleEdit(security)}
-                    style={{
-                      marginRight: "10px",
-                      background: "#ff9800",
-                      color: "white",
-                      border: "none",
-                      padding: "5px 10px",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(security.id)}
-                    style={{
-                      background: "#f44336",
-                      color: "white",
-                      border: "none",
-                      padding: "5px 10px",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {securities.length === 0 && (
+        <div className="table-responsive">
+          <table className="security-table">
+            <thead>
               <tr>
-                <td
-                  colSpan="5"
-                  style={{ textAlign: "center", padding: "20px", color: "#777" }}
-                >
-                  No security guards found.
-                </td>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Shift</th>
+                <th>Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {securities.length > 0 ? (
+                securities.map((security) => (
+                  <tr key={security.id}>
+                    <td>{security.name}</td>
+                    <td>{security.email}</td>
+                    <td>{security.phone}</td>
+                    <td>{security.shift}</td>
+                    <td>
+                      <button className="edit-btn" onClick={() => handleEdit(security)}>Edit</button>
+                      <button className="delete-btn" onClick={() => handleDelete(security.id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="empty-row">No security guards found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AdminLayout>
   );

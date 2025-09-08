@@ -1,0 +1,203 @@
+/* ===== Waiters Page Container ===== */
+.waiters-container {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #fff8f0; /* soft warm background */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  border: 2px solid #ff6f3c; /* orange border */
+}
+
+h2 {
+  margin-bottom: 15px;
+  text-align: center;
+  color: #d62828; /* strong red */
+}
+
+h3 {
+  margin-bottom: 10px;
+  color: #d62828;
+}
+
+/* ===== Messages ===== */
+.message {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.message.success {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #a71d2a;
+  border: 1px solid #f5c6cb;
+}
+
+/* ===== Waiter Form ===== */
+.waiter-form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.waiter-form input {
+  padding: 10px;
+  border: 1px solid #ffb703; /* yellow border */
+  border-radius: 4px;
+  background: #fff;
+}
+
+.waiter-form input:focus {
+  outline: none;
+  border-color: #fb8500; /* orange focus */
+  box-shadow: 0 0 5px rgba(251, 133, 0, 0.5);
+}
+
+.waiter-form button {
+  padding: 10px;
+  background: linear-gradient(45deg, #d62828, #f77f00); /* red → orange */
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.waiter-form button:hover {
+  background: linear-gradient(45deg, #b22222, #e85d04); /* darker red-orange */
+}
+
+/* ===== Waiters Table ===== */
+.waiters-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.waiters-table th,
+.waiters-table td {
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  text-align: left;
+}
+
+.waiters-table th {
+  background: #ffb703; /* golden yellow header */
+  color: #fff;
+}
+
+.waiters-table tr:nth-child(even) {
+  background: #fff3e0; /* light orange row */
+}
+
+.empty {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}
+
+/* ===== Responsive Waiters Page ===== */
+
+/* Tablets (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .waiters-container {
+    padding: 15px;
+    margin: 15px auto;
+  }
+
+  .waiter-form {
+    gap: 8px;
+  }
+
+  .waiter-form input,
+  .waiter-form button {
+    padding: 8px;
+    font-size: 0.95rem;
+  }
+
+  .waiters-table th,
+  .waiters-table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  h2, h3 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  .waiters-container {
+    width: 95%;
+    margin: 10px auto;
+    padding: 15px;
+  }
+
+  .waiter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .waiter-form input,
+  .waiter-form button {
+    width: 100%;
+  }
+
+  .waiters-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .waiters-table th,
+  .waiters-table td {
+    min-width: 120px;
+    font-size: 0.85rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+  }
+}
+
+/* Small Phones (max-width: 480px) */
+@media (max-width: 480px) {
+  .waiters-container {
+    padding: 10px;
+  }
+
+  .waiter-form input,
+  .waiter-form button {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
+  .waiters-table th,
+  .waiters-table td {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+}

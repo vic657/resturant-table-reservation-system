@@ -1,0 +1,267 @@
+/* Wrapper + layout */
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  align-items: stretch;
+  background: #fff7ed; /* page background */
+  position: relative;
+}
+
+/* Sidebar */
+.km-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #b91c1c, #ea580c, #facc15);
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: transform 0.25s ease-in-out;
+  box-sizing: border-box;
+  position: relative; /* static on desktop */
+  z-index: 1000;
+}
+
+.km-sidebar h2 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.km-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.km-sidebar nav button {
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.km-sidebar nav button.active {
+  color: #b91c1c;
+  background: #facc15;
+}
+
+/* Mobile drawer hidden state (applies only under 768px) */
+.km-sidebar.open {
+  /* this class will be toggled on mobile to slide in */
+}
+
+/* Overlay for mobile drawer */
+.km-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0,0,0,0.42);
+}
+
+/* Sidebar toggle button (hamburger) */
+.km-sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1100;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Main area */
+.km-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.km-top {
+  flex: 0 0 auto; /* Navbar area */
+}
+
+.km-content {
+  flex: 1 1 auto;
+  padding: 20px;
+  overflow: auto;
+}
+
+/* Page title */
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #b91c1c;
+  margin: 0 0 12px 0;
+}
+
+/* Form */
+.km-form {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid #facc15;
+  border-radius: 8px;
+  background: #fffbe6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.km-form input,
+.km-form textarea,
+.km-form select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ea580c;
+  box-sizing: border-box;
+}
+
+.km-form button {
+  background: #ea580c;
+  color: white;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: fit-content;
+}
+
+/* Table */
+.km-table-container {
+  max-height: 520px;
+  overflow: auto;
+  border: 2px solid #facc15;
+  border-radius: 6px;
+  background: white;
+}
+
+.km-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px; /* allows horizontal scroll on small screens */
+}
+
+.km-table th,
+.km-table td {
+  border: 1px solid #facc15;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.km-table thead th {
+  background: #fef3c7;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.km-table img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Status cell */
+.status {
+  color: #b91c1c;
+  font-weight: 600;
+}
+.status.served { color: green; }
+
+/* Modal */
+.km-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  background: rgba(0,0,0,0.35);
+}
+
+.km-modal-content {
+  background: white;
+  padding: 22px;
+  border-radius: 10px;
+  width: 92%;
+  max-width: 420px;
+  box-sizing: border-box;
+}
+
+.modal-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    flex-direction: column;
+  }
+
+  .km-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    width: 260px;
+    padding: 24px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  }
+
+  /* when open, slide in */
+  .km-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .km-sidebar-toggle {
+    display: block;
+  }
+
+  .km-main {
+    margin-left: 0;
+  }
+
+  .km-form {
+    padding: 12px;
+  }
+
+  .km-table {
+    min-width: 700px;
+  }
+
+  .km-table th,
+  .km-table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .km-table img {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Small phones: make rows slightly smaller */
+@media (max-width: 420px) {
+  .km-table { min-width: 620px; }
+  .km-form input, .km-form textarea, .km-form select { padding: 8px; font-size: 0.95rem; }
+}

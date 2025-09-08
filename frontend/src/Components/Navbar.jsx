@@ -13,9 +13,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-    }
+    if (storedUser) setUser(storedUser);
   }, []);
 
   const handleLogout = () => {
@@ -27,19 +25,13 @@ export default function Navbar() {
 
   const scrollToSection = (id) => {
     if (location.pathname === "/") {
-      // already on home → smooth scroll
       const section = document.getElementById(id);
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth" });
-      }
+      if (section) section.scrollIntoView({ behavior: "smooth" });
     } else {
-      // not on home → go to home then scroll
       navigate("/");
       setTimeout(() => {
         const section = document.getElementById(id);
-        if (section) {
-          section.scrollIntoView({ behavior: "smooth" });
-        }
+        if (section) section.scrollIntoView({ behavior: "smooth" });
       }, 300);
     }
   };
@@ -49,12 +41,8 @@ export default function Navbar() {
       <nav className="navbar">
         <h1 className="navbar-logo">VC'RestaurantSystem</h1>
         <ul className="navbar-links">
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/menu">Menu</Link>
-          </li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/menu">Menu</Link></li>
           <li>
             <button
               onClick={() => scrollToSection("about")}
@@ -73,7 +61,6 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* Right side */}
         {!user ? (
           <button className="navbar-btn" onClick={() => setIsLoginOpen(true)}>
             Login
@@ -81,11 +68,11 @@ export default function Navbar() {
         ) : (
           <div
             className="user-menu"
-            onMouseEnter={() => setDropdownOpen(true)}
-            onMouseLeave={() => setDropdownOpen(false)}
+            onMouseEnter={() => window.innerWidth > 768 && setDropdownOpen(true)}
+            onMouseLeave={() => window.innerWidth > 768 && setDropdownOpen(false)}
+            onClick={() => setDropdownOpen(!dropdownOpen)} // click toggle for mobile
           >
             <FaUserCircle className="user-icon" />
-
             {dropdownOpen && (
               <div className="dropdown">
                 <p className="dropdown-username">{user.name}</p>

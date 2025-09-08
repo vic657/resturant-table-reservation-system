@@ -1,0 +1,160 @@
+/* ===== Sidebar Styling ===== */
+.sidebar {
+  width: 250px;
+  height: calc(100vh - 60px); /* below navbar */
+  background: linear-gradient(180deg, red, orange, yellow);
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 60px; /* start below navbar */
+  left: 0;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  z-index: 50;
+}
+
+/* Sidebar Logo */
+.sidebar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Sidebar Links */
+.sidebar a,
+.sidebar-dropdown {
+  display: block;
+  padding: 10px 15px;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.sidebar a:hover,
+.sidebar-dropdown:hover {
+  background: rgba(255, 255, 255, 0.2);
+  padding-left: 20px;
+}
+
+/* Sidebar List */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+/* Icons in Sidebar */
+.sidebar li i,
+.sidebar li svg {
+  font-size: 18px;
+  margin: 0;
+}
+
+/* Sidebar Submenu */
+.sidebar-submenu {
+  list-style: none;
+  padding-left: 20px;
+  margin-top: 5px;
+}
+
+.sidebar-submenu li {
+  margin: 8px 0;
+}
+
+.sidebar-submenu li a:hover {
+  color: #fff;
+}
+
+/* Logout Button */
+.sidebar-logout {
+  margin-top: auto;
+  background: #fff;
+  color: red;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar-logout:hover {
+  background: #333;
+  color: yellow;
+}
+
+/* ===== Responsive Sidebar ===== */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -260px; /* hide sidebar by default */
+    top: 60px;
+    z-index: 100;
+  }
+
+  .sidebar.active {
+    left: 0; /* show sidebar when active */
+  }
+}
+
+/* Optional: Sidebar toggle button for mobile */
+.toggle-btn {
+  display: none; /* only show on mobile */
+}
+
+@media (max-width: 768px) {
+  .toggle-btn {
+    display: inline-block;
+    background: red;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .toggle-btn:hover {
+    background: orange;
+  }
+}
+
+/* Adjust main content for responsive sidebar */
+.admin-content {
+  margin-left: 250px;
+  margin-top: 60px;
+  padding: 20px;
+  flex: 1;
+  background: #f8f9fa;
+  min-height: calc(100vh - 60px);
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .admin-content {
+    margin-left: 0; /* content takes full width on mobile */
+  }
+}
