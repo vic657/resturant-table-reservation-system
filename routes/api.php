@@ -15,19 +15,13 @@ use App\Http\Controllers\BookingController;
 // ==========================
 Route::post('/login', [AuthController::class, 'login']);
 
-// ==========================
 // Bookings
-// ==========================
 Route::post('/book-table', [BookingController::class, 'store']);   // create booking
 Route::post('/bookings', [BookingController::class, 'store']);     // alias for booking
 Route::get('/bookings/receipt/{code}', [BookingController::class, 'findByReceipt']);
+Route::post('/booked-tables', [BookingController::class, 'bookedTables']); // check booked tables
 
-// Booked tables (POST so frontend can send date & time in body)
-Route::post('/booked-tables', [BookingController::class, 'bookedTables']);
-
-// ==========================
 // Public Menus
-// ==========================
 Route::get('/menu-show', [MenuShowController::class, 'index']);
 Route::get('/public-menus', [MenuController::class, 'publicIndex']);
 
@@ -35,14 +29,32 @@ Route::get('/public-menus', [MenuController::class, 'publicIndex']);
 // Kitchen Manager routes
 // ==========================
 Route::prefix('kitchen-managers')->group(function () {
-    Route::post('/', [KitchenManagerController::class, 'store']);     // POST api/kitchen-managers
-    Route::get('/', [KitchenManagerController::class, 'index']);      // GET api/kitchen-managers
-    Route::get('/{id}', [KitchenManagerController::class, 'show']);   // GET api/kitchen-managers/{id}
-    Route::delete('/{id}', [KitchenManagerController::class, 'destroy']); // DELETE api/kitchen-managers/{id}
+    Route::post('/', [KitchenManagerController::class, 'store']);
+    Route::get('/', [KitchenManagerController::class, 'index']);
+    Route::get('/{id}', [KitchenManagerController::class, 'show']);
+    Route::delete('/{id}', [KitchenManagerController::class, 'destroy']);
+
+    // Orders under kitchen manager
+    Route::get('/orders', [KitchenManagerController::class, 'getOrders']);
+    Route::post('/orders/{orderId}/assign-waiter', [KitchenManagerController::class, 'assignWaiter']);
+    Route::put('/orders/{orderId}/served', [KitchenManagerController::class, 'markOrderServed']);
+    Route::get('/bookings', [KitchenManagerController::class, 'getBookings']);
 });
 
+// Alias routes for easier frontend use
+Route::get('/orders', [KitchenManagerController::class, 'getOrders']);
+Route::post('/orders/{orderId}/assign-waiter', [KitchenManagerController::class, 'assignWaiter']);
+Route::put('/orders/{orderId}/served', [KitchenManagerController::class, 'markOrderServed']);
+Route::get('/bookings', [KitchenManagerController::class, 'getBookings']);
+
 // ==========================
-// Menu routes (for Kitchen Manager - protected)
+// Waiter routes (public/auth-protected as needed)
+// ==========================
+Route::get('/waiters', [WaiterController::class, 'index']); // list all waiters
+Route::get('/waiters/{waiter}/orders', [WaiterController::class, 'getOrders']); // fetch specific waiter's orders
+
+// ==========================
+// Menu routes (protected)
 // ==========================
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/menus', [MenuController::class, 'index']);
@@ -52,11 +64,13 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // ==========================
-// Admin routes
+// Admin routes (protected)
 // ==========================
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
-    // Waiters
+    // Waiters CRUD
     Route::apiResource('waiters', WaiterController::class);
+    Route::post('/orders/{order}/served', [KitchenManagerController::class, 'markOrderServed']);
+
 
     // Securities
     Route::get('/securities', [SecurityController::class, 'index']);

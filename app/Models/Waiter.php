@@ -21,4 +21,10 @@ class Waiter extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    // Relationship: Waiter has many orders
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

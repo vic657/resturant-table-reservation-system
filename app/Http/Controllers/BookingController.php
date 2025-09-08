@@ -57,16 +57,37 @@ class BookingController extends Controller
     }
 
     // ✅ For waiter lookup
-    public function findByReceipt($code)
-    {
-        $booking = Booking::with('orders')->where('receipt_code', $code)->first();
+   public function findByReceipt($code)
+{
+    $booking = Booking::with('orders')->where('receipt_code', $code)->first();
 
-        if (!$booking) {
-            return response()->json(['message' => 'Invalid receipt code'], 404);
-        }
-
-        return response()->json($booking);
+    if (!$booking) {
+        return response()->json(['message' => 'Invalid receipt code'], 404);
     }
+
+    return response()->json([
+        'booking' => [
+            'id'           => $booking->id,
+            'name'         => $booking->name,
+            'email'        => $booking->email ?? null, // add email column if exists
+            'phone'        => $booking->phone,
+            'tables'       => json_decode($booking->tables, true),
+            'date'         => $booking->date,
+            'time'         => $booking->time,
+            'receipt_code' => $booking->receipt_code,
+            'total'        => $booking->total,
+        ],
+        'orders' => $booking->orders->map(function($order) {
+            return [
+                'id'       => $order->id,
+                'name'     => $order->name,
+                'price'    => $order->price,
+                'quantity' => $order->quantity,
+                'subtotal' => $order->subtotal,
+            ];
+        }),
+    ]);
+}
 
     // ✅ Check booked tables for a given date (ignore time)
 public function bookedTables(Request $request)

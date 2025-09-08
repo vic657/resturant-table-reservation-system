@@ -78,4 +78,18 @@ class WaiterController extends Controller
 
         return response()->json(null, 204);
     }
+    public function getOrders($waiterId)
+{
+    $waiter = Waiter::find($waiterId);
+
+    if (!$waiter) {
+        return response()->json(['message' => 'Waiter not found'], 404);
+    }
+
+    // Assuming orders relationship exists
+    $orders = $waiter->orders()->with('booking')->get();
+
+    return response()->json($orders);
+}
+
 }

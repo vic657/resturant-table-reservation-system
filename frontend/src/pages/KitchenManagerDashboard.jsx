@@ -16,7 +16,11 @@ export default function KitchenManagerDashboard() {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [editMenu, setEditMenu] = useState(null);
 
-  // Fetch menus
+  // Orders + waiters
+  const [orders, setOrders] = useState([]);
+  const [waiters, setWaiters] = useState([]);
+
+  // ===== Fetch menus =====
   const fetchMenus = async () => {
     try {
       const res = await axiosClient.get("/menus");
@@ -33,13 +37,37 @@ export default function KitchenManagerDashboard() {
     }
   };
 
+  // ===== Fetch orders =====
+  const fetchOrders = async () => {
+    try {
+      const res = await axiosClient.get("/orders");
+      setOrders(res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+      setOrders([]);
+    }
+  };
+
+  // ===== Fetch waiters =====
+  const fetchWaiters = async () => {
+    try {
+      const res = await axiosClient.get("/waiters");
+      setWaiters(res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch waiters:", err);
+      setWaiters([]);
+    }
+  };
+
   useEffect(() => {
-    if (activeView === "menu") {
-      fetchMenus();
+    if (activeView === "menu") fetchMenus();
+    if (activeView === "orders") {
+      fetchOrders();
+      fetchWaiters();
     }
   }, [activeView]);
 
-  // Handle create menu
+  // ===== Handle create menu =====
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -69,7 +97,7 @@ export default function KitchenManagerDashboard() {
     }
   };
 
-  // Handle delete menu
+  // ===== Handle delete menu =====
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this menu?")) return;
     try {
@@ -80,7 +108,7 @@ export default function KitchenManagerDashboard() {
     }
   };
 
-  // Open update modal
+  // ===== Open update modal =====
   const handleUpdate = (menu) => {
     setEditMenu(menu);
     setName(menu.name);
@@ -91,7 +119,7 @@ export default function KitchenManagerDashboard() {
     setShowUpdateModal(true);
   };
 
-  // Submit update
+  // ===== Submit update =====
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     if (!editMenu) return;
@@ -118,6 +146,18 @@ export default function KitchenManagerDashboard() {
       setImage(null);
     } catch (err) {
       console.error("Failed to update menu:", err);
+    }
+  };
+
+  // ===== Assign waiter =====
+  const assignWaiter = async (orderId, waiterId) => {
+    try {
+      await axiosClient.post(`/orders/${orderId}/assign-waiter`, {
+        waiter_id: waiterId,
+      });
+      fetchOrders();
+    } catch (err) {
+      console.error("Failed to assign waiter:", err);
     }
   };
 
@@ -202,6 +242,7 @@ export default function KitchenManagerDashboard() {
           </h1>
         )}
 
+        {/* === Manage Menu View === */}
         {activeView === "menu" && (
           <>
             <h1
@@ -318,7 +359,7 @@ export default function KitchenManagerDashboard() {
               </button>
             </form>
 
-            {/* Scrollable Menu Table */}
+            {/* Menu Table */}
             <div
               style={{
                 maxHeight: "400px",
@@ -370,14 +411,10 @@ export default function KitchenManagerDashboard() {
                   {menus.length > 0 ? (
                     menus.map((menu) => (
                       <tr key={menu.id} style={{ textAlign: "center" }}>
-                        <td
-                          style={{ border: "1px solid #facc15", padding: "10px" }}
-                        >
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
                           {menu.id}
                         </td>
-                        <td
-                          style={{ border: "1px solid #facc15", padding: "10px" }}
-                        >
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
                           {menu.image ? (
                             <img
                               src={menu.image}
@@ -393,19 +430,13 @@ export default function KitchenManagerDashboard() {
                             "No Image"
                           )}
                         </td>
-                        <td
-                          style={{ border: "1px solid #facc15", padding: "10px" }}
-                        >
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
                           {menu.name}
                         </td>
-                        <td
-                          style={{ border: "1px solid #facc15", padding: "10px" }}
-                        >
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
                           {menu.category}
                         </td>
-                        <td
-                          style={{ border: "1px solid #facc15", padding: "10px" }}
-                        >
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
                           {menu.description}
                         </td>
                         <td
@@ -418,9 +449,7 @@ export default function KitchenManagerDashboard() {
                         >
                           Ksh {menu.price}
                         </td>
-                        <td
-                          style={{ border: "1px solid #facc15", padding: "10px" }}
-                        >
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
                           <button
                             onClick={() => handleUpdate(menu)}
                             style={{
@@ -467,7 +496,131 @@ export default function KitchenManagerDashboard() {
           </>
         )}
 
-         {/* Update Modal */}
+        {/* === Orders View === */}
+        {activeView === "orders" && (
+          <>
+            <h1
+              style={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                marginBottom: "20px",
+                color: "#b91c1c",
+              }}
+            >
+              Manage Orders
+            </h1>
+            <div
+              style={{
+                maxHeight: "500px",
+                overflowY: "auto",
+                border: "2px solid #facc15",
+                borderRadius: "6px",
+              }}
+            >
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  background: "white",
+                }}
+              >
+                <thead
+                  style={{ background: "#fef3c7", position: "sticky", top: 0 }}
+                >
+                  <tr>
+                    <th style={{ border: "1px solid #facc15", padding: "10px" }}>
+                      ID
+                    </th>
+                    <th style={{ border: "1px solid #facc15", padding: "10px" }}>
+                      Booking
+                    </th>
+                    <th style={{ border: "1px solid #facc15", padding: "10px" }}>
+                      Item
+                    </th>
+                    <th style={{ border: "1px solid #facc15", padding: "10px" }}>
+                      Qty
+                    </th>
+                    <th style={{ border: "1px solid #facc15", padding: "10px" }}>
+                      Subtotal
+                    </th>
+                    <th style={{ border: "1px solid #facc15", padding: "10px" }}>
+                      Status
+                    </th>
+                    <th style={{ border: "1px solid #facc15", padding: "10px" }}>
+                      Waiter
+                    </th>
+                    <th style={{ border: "1px solid #facc15", padding: "10px" }}>
+                      Assign
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.length > 0 ? (
+                    orders.map((order) => (
+                      <tr key={order.id} style={{ textAlign: "center" }}>
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
+                          {order.id}
+                        </td>
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
+                          {order.booking_id}
+                        </td>
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
+                          {order.name}
+                        </td>
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
+                          {order.quantity}
+                        </td>
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
+                          Ksh {order.subtotal}
+                        </td>
+                        <td
+                          style={{
+                            border: "1px solid #facc15",
+                            padding: "10px",
+                            color: order.status === "served" ? "green" : "#b91c1c",
+                          }}
+                        >
+                          {order.status || "pending"}
+                        </td>
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
+                          {order.waiter?.name || "Not Assigned"}
+                        </td>
+                        <td style={{ border: "1px solid #facc15", padding: "10px" }}>
+                          <select
+                            onChange={(e) =>
+                              assignWaiter(order.id, e.target.value)
+                            }
+                            defaultValue={order.waiter?.id || ""}
+                            style={{
+                              padding: "6px",
+                              borderRadius: "4px",
+                              border: "1px solid #ea580c",
+                            }}
+                          >
+                            <option value="">Select</option>
+                            {waiters.map((w) => (
+                              <option key={w.id} value={w.id}>
+                                {w.name}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="8" style={{ padding: "20px" }}>
+                        No orders found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* === Update Modal === */}
         {showUpdateModal && (
           <div
             style={{
@@ -485,13 +638,20 @@ export default function KitchenManagerDashboard() {
             <div
               style={{
                 background: "white",
-                padding: "20px",
+                padding: "30px",
                 borderRadius: "8px",
                 width: "400px",
               }}
             >
-              <h2 style={{ marginBottom: "15px", color: "#b91c1c" }}>
-                Update Menu Item
+              <h2
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  marginBottom: "20px",
+                  color: "#b91c1c",
+                }}
+              >
+                Update Menu
               </h2>
               <form onSubmit={handleUpdateSubmit}>
                 <input
@@ -500,14 +660,28 @@ export default function KitchenManagerDashboard() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    width: "100%",
+                    padding: "10px",
+                    border: "1px solid #ea580c",
+                    borderRadius: "6px",
+                  }}
                 />
                 <textarea
                   placeholder="Description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   required
-                  style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    width: "100%",
+                    padding: "10px",
+                    border: "1px solid #ea580c",
+                    borderRadius: "6px",
+                  }}
                 />
                 <input
                   type="number"
@@ -515,13 +689,27 @@ export default function KitchenManagerDashboard() {
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   required
-                  style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    width: "100%",
+                    padding: "10px",
+                    border: "1px solid #ea580c",
+                    borderRadius: "6px",
+                  }}
                 />
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   required
-                  style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    width: "100%",
+                    padding: "10px",
+                    border: "1px solid #ea580c",
+                    borderRadius: "6px",
+                  }}
                 >
                   <option value="">Select Category</option>
                   <option value="drinks">Drinks</option>
@@ -533,37 +721,43 @@ export default function KitchenManagerDashboard() {
                   type="file"
                   onChange={(e) => setImage(e.target.files[0])}
                   accept="image/*"
-                  style={{ display: "block", marginBottom: "10px", width: "100%" }}
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    width: "100%",
+                    padding: "10px",
+                    border: "1px solid #ea580c",
+                    borderRadius: "6px",
+                  }}
                 />
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-                  <button
-                    type="button"
-                    onClick={() => setShowUpdateModal(false)}
-                    style={{
-                      background: "#aaa",
-                      color: "white",
-                      padding: "6px 12px",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    style={{
-                      background: "#ea580c",
-                      color: "white",
-                      padding: "6px 12px",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Save Changes
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  style={{
+                    background: "#ea580c",
+                    color: "white",
+                    padding: "10px 20px",
+                    borderRadius: "6px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Update
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowUpdateModal(false)}
+                  style={{
+                    background: "#b91c1c",
+                    color: "white",
+                    padding: "10px 20px",
+                    borderRadius: "6px",
+                    border: "none",
+                    cursor: "pointer",
+                    marginLeft: "10px",
+                  }}
+                >
+                  Cancel
+                </button>
               </form>
             </div>
           </div>

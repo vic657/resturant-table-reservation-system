@@ -3,19 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import axiosClient from "../axiosClient";
 
 export default function Receipt() {
-  const { receiptCode } = useParams(); // ✅ comes from /receipt/:receiptCode route
+  const { receiptCode } = useParams();
   const navigate = useNavigate();
-  const [booking, setBooking] = useState(null);
+  const [receipt, setReceipt] = useState(null); // booking + orders
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null); // ✅ For thank you message
+  const [message, setMessage] = useState(null);
 
-  // Fetch booking details
+  // Fetch receipt details
   useEffect(() => {
     const fetchReceipt = async () => {
       try {
         const res = await axiosClient.get(`/bookings/receipt/${receiptCode}`);
-        setBooking(res.data);
+        setReceipt(res.data);
       } catch (err) {
         console.error("Failed to load receipt:", err);
         setError("Receipt not found or expired.");
@@ -26,20 +26,24 @@ export default function Receipt() {
     fetchReceipt();
   }, [receiptCode]);
 
-  // Download receipt (print to PDF) and show thank you
   const handleDownload = () => {
-    window.print(); // ✅ lets user download or print
-
+    window.print();
     setMessage("Thank you! Your booking has been confirmed.");
-
-    // Redirect back home after 3 seconds
-    setTimeout(() => {
-      navigate("/");
-    }, 3000);
+    setTimeout(() => navigate("/"), 3000);
   };
 
   if (loading) return <p style={{ textAlign: "center" }}>Loading receipt...</p>;
   if (error) return <p style={{ textAlign: "center", color: "red" }}>{error}</p>;
+
+  const booking = receipt?.booking;
+  const orders = receipt?.orders || [];
+
+  // Dynamically calculate subtotal and total
+  const totalAmount = orders.reduce((sum, order) => {
+    const price = Number(order.price) || 0;
+    const qty = Number(order.quantity) || 0;
+    return sum + price * qty;
+  }, 0);
 
   return (
     <div style={{ padding: "20px", background: "#fff7ed", minHeight: "100vh" }}>
@@ -82,12 +86,13 @@ export default function Receipt() {
             boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
           }}
         >
-          {/* Receipt Header */}
+          {/* Booking Header */}
           <h2 style={{ color: "#ea580c" }}>Receipt Code: {booking.receipt_code}</h2>
           <p><strong>Name:</strong> {booking.name}</p>
-          <p><strong>Email:</strong> {booking.email}</p>
+          {booking.email && <p><strong>Email:</strong> {booking.email}</p>}
           <p><strong>Phone:</strong> {booking.phone}</p>
-          <p><strong>Date:</strong> {new Date(booking.created_at).toLocaleString()}</p>
+          <p><strong>Table(s):</strong> {booking.tables.join(", ")}</p>
+          <p><strong>Date & Time:</strong> {booking.date} {booking.time}</p>
 
           <hr style={{ margin: "15px 0" }} />
 
@@ -99,25 +104,28 @@ export default function Receipt() {
                 <th style={{ border: "1px solid #ddd", padding: "8px" }}>Item</th>
                 <th style={{ border: "1px solid #ddd", padding: "8px" }}>Qty</th>
                 <th style={{ border: "1px solid #ddd", padding: "8px" }}>Price</th>
-                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Total</th>
+                <th style={{ border: "1px solid #ddd", padding: "8px" }}>Subtotal</th>
               </tr>
             </thead>
             <tbody>
-              {booking.orders.map((order) => (
-                <tr key={order.id}>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>{order.name}</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>{order.quantity}</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Ksh {order.price}</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                    Ksh {order.price * order.quantity}
-                  </td>
-                </tr>
-              ))}
+              {orders.map((order) => {
+                const price = Number(order.price) || 0;
+                const qty = Number(order.quantity) || 0;
+                const subtotal = price * qty;
+                return (
+                  <tr key={order.id}>
+                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{order.name}</td>
+                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>{qty}</td>
+                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>Ksh {price}</td>
+                    <td style={{ border: "1px solid #ddd", padding: "8px" }}>Ksh {subtotal}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
           <h2 style={{ marginTop: "20px", color: "#16a34a" }}>
-            Total: Ksh {booking.total}
+            Total: Ksh {totalAmount}
           </h2>
 
           {/* Download Button */}
