@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  https://resturant-table-reservation-system.onrender.com // ✅ pulled from Netlify env
+ baseURL: "https://resturant-table-reservation-system.onrender.com/api", 
 });
 
 // Attach token automatically
