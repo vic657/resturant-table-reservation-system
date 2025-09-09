@@ -1,8 +1,7 @@
-// src/axiosClient.jsx
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // ✅ pulled from Netlify env
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 // Attach token automatically
