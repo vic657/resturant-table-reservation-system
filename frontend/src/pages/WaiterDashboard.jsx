@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosClient from "../axiosClient"; // ✅ use configured client
 import Navbar from "../Components/Navbar";
 import "../WaiterDashboard.css";
 
@@ -23,10 +23,7 @@ export default function WaiterDashboard() {
   const fetchOrders = async () => {
     if (!waiterId) return;
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/waiters/${waiterId}/orders`
-
-      );
+      const res = await axiosClient.get(`/waiters/${waiterId}/orders`); // ✅ baseURL handled
       setOrders(res.data);
     } catch (err) {
       console.error("Failed to fetch orders:", err);
@@ -37,9 +34,7 @@ export default function WaiterDashboard() {
     if (!receiptCode) return;
     setLoadingBooking(true);
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/bookings/receipt/${receiptCode}`
-      );
+      const res = await axiosClient.get(`/bookings/receipt/${receiptCode}`); // ✅ baseURL handled
       setBookingDetails(res.data);
     } catch (err) {
       console.error("Invalid receipt code", err);
@@ -52,10 +47,7 @@ export default function WaiterDashboard() {
 
   const serveOrder = async (orderId) => {
     try {
-      await axios.put(
-        `http://127.0.0.1:8000/api/orders/${orderId}/served`,
-        { waiter_id: waiterId }
-      );
+      await axiosClient.put(`/orders/${orderId}/served`, { waiter_id: waiterId }); // ✅ baseURL handled
       setOrders((prev) =>
         prev.map((order) =>
           order.id === orderId
@@ -94,10 +86,7 @@ export default function WaiterDashboard() {
 
       {/* Overlay for mobile */}
       {sidebarOpen && (
-        <div
-          className="waiter-overlay"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="waiter-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Sidebar toggle */}
