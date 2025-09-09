@@ -1,7 +1,8 @@
+// src/axiosClient.jsx
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "https://resturant-table-reservation-system.onrender.com/api", 
+  baseURL: import.meta.env.VITE_API_BASE_URL, // ✅ pulled from Netlify env
 });
 
 // Attach token automatically
