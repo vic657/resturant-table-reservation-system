@@ -27,7 +27,7 @@ export default function BookTable() {
   useEffect(() => {
     if (formData.date) {
       axiosClient
-        .post("/booked-tables", { date: formData.date }) // ✅ send only date
+        .post(`${import.meta.env.VITE_API_URL}/booked-tables`, { date: formData.date }) // ✅ send only date
         .then((res) => setBookedTables(res.data))
         .catch((err) => {
           console.error("Error fetching booked tables:", err);
