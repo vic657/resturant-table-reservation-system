@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://127.0.0.1:8000/api", // Laravel API URL
+  baseURL: import.meta.env.VITE_API_URL,
+ // Laravel API URL
   withCredentials: true,
 });
 

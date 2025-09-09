@@ -24,7 +24,8 @@ export default function WaiterDashboard() {
     if (!waiterId) return;
     try {
       const res = await axios.get(
-        `http://127.0.0.1:8000/api/waiters/${waiterId}/orders`
+        `${import.meta.env.VITE_API_URL}/waiters/${waiterId}/orders`
+
       );
       setOrders(res.data);
     } catch (err) {
@@ -37,7 +38,7 @@ export default function WaiterDashboard() {
     setLoadingBooking(true);
     try {
       const res = await axios.get(
-        `http://127.0.0.1:8000/api/bookings/receipt/${receiptCode}`
+        `${import.meta.env.VITE_API_URL}/bookings/receipt/${receiptCode}`
       );
       setBookingDetails(res.data);
     } catch (err) {
