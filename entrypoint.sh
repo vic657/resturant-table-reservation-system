@@ -14,6 +14,7 @@ echo "MySQL is up!"
 php artisan config:clear
 php artisan cache:clear
 php artisan migrate --force
+php artisan db:seed --force   # ✅ run seeders in production too
 
 # Start Apache
 apache2-foreground
