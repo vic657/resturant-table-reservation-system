@@ -9,6 +9,7 @@ use App\Http\Controllers\KitchenManagerController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MenuShowController;
 use App\Http\Controllers\BookingController;
+use App\Http\Middleware\Cors;
 
 // ==========================
 // Public routes
