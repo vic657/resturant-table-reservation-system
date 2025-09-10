@@ -36,8 +36,12 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Configure Apache to use Laravel's public directory as the web root
 RUN echo "DocumentRoot /var/www/html/public" > /etc/apache2/sites-available/000-default.conf
 
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Expose port 80
 EXPOSE 80
 
-# Run artisan commands before starting server
-CMD php artisan config:cache && php artisan route:cache && php artisan view:cache && apache2-foreground
+# Use entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
