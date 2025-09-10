@@ -28,6 +28,6 @@ return [
     'max_age' => 0,
 
     // Important if using Sanctum / withCredentials
-    'supports_credentials' => true,
+    'supports_credentials' => false,
 
 ];
