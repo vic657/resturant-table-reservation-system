@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axiosClient from "../axiosClient"; // ✅ use configured client
 import "../index.css";
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +12,7 @@ function LoginModal({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axiosClient.post("/login", { 
+      const res = await axiosClient.post("/login", {
         email,
         password,
       });
@@ -22,23 +22,29 @@ function LoginModal({ onClose }) {
       localStorage.setItem("user", JSON.stringify(res.data.user));
       localStorage.setItem("role", res.data.role);
 
-      // Decide redirect based on role
-      if (res.data.role === "admin") {
-        navigate("/admin/dashboard");
-      } else if (res.data.role === "kitchen_manager") {
-        navigate("/kitchen-manager/dashboard");
-      } else if (res.data.role === "waiter") {
-        navigate("/waiter/dashboard");
-      } else if (res.data.role === "security") {
-        navigate("/security/dashboard");
-      } else if (res.data.role === "accountant") {
-        navigate("/accountant/dashboard");
-      } else {
-        navigate("/"); // fallback regular user
+      // ✅ Role-based redirects
+      switch (res.data.role) {
+        case "admin":
+          navigate("/admin/dashboard");
+          break;
+        case "kitchen_manager":
+          navigate("/kitchen-manager/dashboard");
+          break;
+        case "waiter":
+          navigate("/waiter/dashboard");
+          break;
+        case "security":
+          navigate("/security/dashboard");
+          break;
+        case "accountant":
+          navigate("/accountant/dashboard");
+          break;
+        default:
+          navigate("/"); // fallback → regular user
       }
 
       onClose();
-    } catch {
+    } catch (err) {
       setError("Invalid email or password");
     }
   };
@@ -60,6 +66,7 @@ function LoginModal({ onClose }) {
             className="modal-input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           <input
@@ -68,6 +75,7 @@ function LoginModal({ onClose }) {
             className="modal-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
 
           <button type="submit" className="modal-button">

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "../Components/Navbar";
 import { FaFacebookF, FaInstagram, FaTwitter, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
-import axios from "axios";
+import axiosClient from "../axiosClient"; // ✅ changed from axios
 import "../index.css";
 
 import r1 from "../assets/r1.jpg";
@@ -27,13 +27,13 @@ export default function LandingPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/login", { email, password });
+      const res = await axiosClient.post("/login", { email, password }); // ✅ use axiosClient
       localStorage.setItem("token", res.data.token);
       setShowLogin(false);
       setEmail("");
       setPassword("");
       setError("");
-      window.location.href = "/dashboard"; // redirect after login
+      window.location.href = "/dashboard"; // keep your original redirect
     } catch (err) {
       setError("Invalid email or password");
     }
