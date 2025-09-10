@@ -1,11 +1,19 @@
 #!/bin/bash
+# wait-for-mysql.sh
 
-echo "Running Laravel setup..."
+host="${DB_HOST:-mysql}"
+port="${DB_PORT:-3306}"
 
+echo "Waiting for MySQL at $host:$port..."
+while ! mysql -h "$host" -P "$port" -u "$DB_USERNAME" -p"$DB_PASSWORD" -e "SELECT 1;" &> /dev/null; do
+  sleep 2
+done
+echo "MySQL is up!"
+
+# Then run Laravel setup
+php artisan config:clear
+php artisan cache:clear
 php artisan migrate --force
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
 
-echo "Starting Apache..."
-exec apache2-foreground
+# Start Apache
+apache2-foreground
