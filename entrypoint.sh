@@ -13,7 +13,6 @@ echo "MySQL is up!"
 # Then run Laravel setup
 php artisan config:clear
 php artisan cache:clear
-php artisan migrate --force
 php artisan db:seed --force   # ✅ run seeders in production too
 
 # Start Apache
