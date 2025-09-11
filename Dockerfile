@@ -5,15 +5,7 @@ WORKDIR /var/www/html
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    curl \
+    git unzip libpng-dev libjpeg-dev libfreetype6-dev libonig-dev libxml2-dev zip curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd mbstring exif pcntl bcmath opcache
 
@@ -36,12 +28,15 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Configure Apache to use Laravel's public directory as the web root
 RUN echo "DocumentRoot /var/www/html/public" > /etc/apache2/sites-available/000-default.conf
 
+# Set Apache to listen on Railway dynamic port
+ENV APACHE_RUN_PORT=${PORT}
+
+# Expose Railway port
+EXPOSE ${PORT}
+
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-# Expose port 80
-EXPOSE ${PORT}
 
 # Use entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]
