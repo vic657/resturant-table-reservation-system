@@ -2,22 +2,15 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Laravel CORS Configuration
-    |--------------------------------------------------------------------------
-    */
-
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'login', 'logout'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-   'allowed_origins' => [
-    'http://localhost:5173',         // local React dev
-    'http://127.0.0.1:5173',         // Vite sometimes uses 127
-    'https://resturant-reserve.netlify.app', // production frontend
-],
-
+    'allowed_origins' => [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'https://resturant-reserve.netlify.app',
+    ],
 
     'allowed_origins_patterns' => [],
 
@@ -27,7 +20,6 @@ return [
 
     'max_age' => 0,
 
-    // Important if using Sanctum / withCredentials
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];
