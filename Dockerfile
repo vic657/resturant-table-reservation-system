@@ -41,7 +41,7 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Expose port 80
-EXPOSE 80
+EXPOSE ${PORT}
 
 # Use entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]
