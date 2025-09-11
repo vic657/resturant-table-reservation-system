@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     git unzip libpng-dev libjpeg-dev libfreetype6-dev \
     libonig-dev libxml2-dev zip curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd mbstring exif pcntl bcmath opcache
+    && docker-php-ext-install pdo pdo_mysql gd mbstring exif pcntl bcmath opcache \
+    && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache rewrite
 RUN a2enmod rewrite
@@ -26,11 +27,12 @@ RUN composer install --optimize-autoloader --no-dev
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Configure Apache public dir
+# Configure Apache to use Laravel's public dir
 RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf \
-    && echo "<Directory /var/www/html/public>\n    AllowOverride All\n</Directory>" >> /etc/apache2/sites-available/000-default.conf
+    && echo "<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>" >> /etc/apache2/sites-available/000-default.conf \
+    && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Expose port 10000 (Render requirement)
+# Render requires exposing the same port it assigns ($PORT)
 EXPOSE 10000
 
 # Copy entrypoint
