@@ -34,7 +34,14 @@ public function store(Request $request)
 
     if ($request->hasFile('image')) {
         $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-        $request->file('image')->move(public_path('menu_images'), $imageName);
+        $path = public_path('menu_images');
+
+        // ✅ Make sure folder exists
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        $request->file('image')->move($path, $imageName);
         $data['image'] = 'menu_images/' . $imageName;
     }
 
