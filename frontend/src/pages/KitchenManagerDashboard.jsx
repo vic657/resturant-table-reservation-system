@@ -154,7 +154,7 @@ export default function KitchenManagerDashboard() {
       await axiosClient.post(`/orders/${orderId}/assign-waiter`, { waiter_id: waiterId });
       fetchOrders();
     } catch (err) {
-      console.error("Failed to assign waiter:", err);
+      console.error("error occured!Failed to assign waiter:", err);
     }
   };
 
