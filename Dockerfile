@@ -33,7 +33,8 @@ RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
 # Render requires exposing the same port it assigns ($PORT)
-EXPOSE 10000
+EXPOSE ${PORT:-8000}
+
 
 # Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh
