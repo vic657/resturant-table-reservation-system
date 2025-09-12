@@ -23,3 +23,4 @@ class AppServiceProvider extends ServiceProvider
         URL::forceScheme('https'); // forces asset URLs to use https
     }
 }
+}
