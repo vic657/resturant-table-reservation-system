@@ -4,93 +4,93 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
     // Fetch all menu items
     public function index()
-{
-    $menus = Menu::all()->map(function ($menu) {
+    {
+        $menus = Menu::all()->map(function ($menu) {
+            if ($menu->image) {
+                $menu->image = asset('storage/' . $menu->image); // converts to full URL
+            }
+            return $menu;
+        });
+
+        return response()->json($menus);
+    }
+
+    // Create a new menu
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'        => 'required|string',
+            'category'    => 'required|in:drinks,beverages,foods,snacks',
+            'price'       => 'required|numeric',
+            'description' => 'nullable|string',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $data = $request->only(['name', 'category', 'price', 'description']);
+
+        if ($request->hasFile('image')) {
+            // store in storage/app/public/menu_images
+            $path = $request->file('image')->store('menu_images', 'public');
+            $data['image'] = $path;
+        }
+
+        $menu = Menu::create($data);
+
         if ($menu->image) {
-            $menu->image = asset($menu->image); // converts to full URL
-        }
-        return $menu;
-    });
-
-    return response()->json($menus);
-}
-
-public function store(Request $request)
-{
-    $request->validate([
-        'name'        => 'required|string',
-        'category'    => 'required|in:drinks,beverages,foods,snacks',
-        'price'       => 'required|numeric',
-        'description' => 'nullable|string',
-        'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
-
-    $data = $request->only(['name', 'category', 'price', 'description']);
-
-    if ($request->hasFile('image')) {
-        $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-        $path = public_path('menu_images');
-
-        // ✅ Make sure folder exists
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
+            $menu->image = asset('storage/' . $menu->image); // return full URL
         }
 
-        $request->file('image')->move($path, $imageName);
-        $data['image'] = 'menu_images/' . $imageName;
+        return response()->json($menu, 201);
     }
 
-    $menu = Menu::create($data);
+    // Update an existing menu
+    public function update(Request $request, Menu $menu)
+    {
+        $request->validate([
+            'name'        => 'required|string',
+            'category'    => 'required|in:drinks,beverages,foods,snacks',
+            'price'       => 'required|numeric',
+            'description' => 'nullable|string',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-    if ($menu->image) {
-        $menu->image = asset($menu->image); // return full URL
+        $data = $request->only(['name', 'category', 'price', 'description']);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($menu->image && Storage::disk('public')->exists($menu->image)) {
+                Storage::disk('public')->delete($menu->image);
+            }
+
+            $path = $request->file('image')->store('menu_images', 'public');
+            $data['image'] = $path;
+        }
+
+        $menu->update($data);
+
+        if ($menu->image) {
+            $menu->image = asset('storage/' . $menu->image); // return full URL
+        }
+
+        return response()->json($menu);
     }
 
-    return response()->json($menu, 201);
-}
+    // Delete a menu
+    public function destroy(Menu $menu)
+    {
+        // Delete the image file if exists
+        if ($menu->image && Storage::disk('public')->exists($menu->image)) {
+            Storage::disk('public')->delete($menu->image);
+        }
 
-public function update(Request $request, Menu $menu)
-{
-    $request->validate([
-        'name'        => 'required|string',
-        'category'    => 'required|in:drinks,beverages,foods,snacks',
-        'price'       => 'required|numeric',
-        'description' => 'nullable|string',
-        'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
+        $menu->delete();
 
-    $data = $request->only(['name', 'category', 'price', 'description']);
-
-    if ($request->hasFile('image')) {
-        $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-        $request->file('image')->move(public_path('menu_images'), $imageName);
-        $data['image'] = 'menu_images/' . $imageName;
+        return response()->json(['message' => 'Menu deleted successfully']);
     }
-
-    $menu->update($data);
-
-    if ($menu->image) {
-        $menu->image = asset($menu->image); // return full URL
-    }
-
-    return response()->json($menu);
-}
-public function destroy(Menu $menu)
-{
-    // Delete the image file if exists
-    if ($menu->image && file_exists(public_path($menu->image))) {
-        unlink(public_path($menu->image));
-    }
-
-    $menu->delete();
-
-    return response()->json(['message' => 'Menu deleted successfully']);
-}
-
-
 }
