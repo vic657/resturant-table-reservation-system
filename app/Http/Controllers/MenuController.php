@@ -4,18 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    // Path to persistent storage folder on Render
-    private $storagePath = '/mnt/storage/menu_images';
-
     // Fetch all menu items
     public function index()
     {
         $menus = Menu::all()->map(function ($menu) {
             if ($menu->image) {
-                $menu->image = asset($menu->image); // full URL for React
+                $menu->image = asset('storage/' . $menu->image); // converts to full URL
             }
             return $menu;
         });
@@ -37,22 +35,15 @@ class MenuController extends Controller
         $data = $request->only(['name', 'category', 'price', 'description']);
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time().'_'.$file->getClientOriginalName();
-
-            // Ensure directory exists
-            if (!file_exists($this->storagePath)) {
-                mkdir($this->storagePath, 0755, true);
-            }
-
-            $file->move($this->storagePath, $filename);
-            $data['image'] = '/menu_images/' . $filename; // path relative to public URL
+            // store in storage/app/public/menu_images
+            $path = $request->file('image')->store('menu_images', 'public');
+            $data['image'] = $path;
         }
 
         $menu = Menu::create($data);
 
         if ($menu->image) {
-            $menu->image = asset($menu->image);
+            $menu->image = asset('storage/' . $menu->image); // return full URL
         }
 
         return response()->json($menu, 201);
@@ -73,28 +64,18 @@ class MenuController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($menu->image) {
-                $oldImage = $_SERVER['DOCUMENT_ROOT'] . $menu->image;
-                if (file_exists($oldImage)) {
-                    unlink($oldImage);
-                }
+            if ($menu->image && Storage::disk('public')->exists($menu->image)) {
+                Storage::disk('public')->delete($menu->image);
             }
 
-            $file = $request->file('image');
-            $filename = time().'_'.$file->getClientOriginalName();
-
-            if (!file_exists($this->storagePath)) {
-                mkdir($this->storagePath, 0755, true);
-            }
-
-            $file->move($this->storagePath, $filename);
-            $data['image'] = '/menu_images/' . $filename;
+            $path = $request->file('image')->store('menu_images', 'public');
+            $data['image'] = $path;
         }
 
         $menu->update($data);
 
         if ($menu->image) {
-            $menu->image = asset($menu->image);
+            $menu->image = asset('storage/' . $menu->image); // return full URL
         }
 
         return response()->json($menu);
@@ -103,11 +84,9 @@ class MenuController extends Controller
     // Delete a menu
     public function destroy(Menu $menu)
     {
-        if ($menu->image) {
-            $oldImage = $_SERVER['DOCUMENT_ROOT'] . $menu->image;
-            if (file_exists($oldImage)) {
-                unlink($oldImage);
-            }
+        // Delete the image file if exists
+        if ($menu->image && Storage::disk('public')->exists($menu->image)) {
+            Storage::disk('public')->delete($menu->image);
         }
 
         $menu->delete();

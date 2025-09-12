@@ -32,6 +32,9 @@ RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available
     && echo "<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>" >> /etc/apache2/sites-available/000-default.conf \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
+# Run storage link during build
+RUN php artisan storage:link || true
+
 # Render requires exposing the same port it assigns ($PORT)
 EXPOSE 10000
 
