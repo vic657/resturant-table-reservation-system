@@ -11,6 +11,9 @@ return [
         'http://127.0.0.1:5173',
         'https://resturant-reserve.netlify.app',
         'https://resturant-table-reservation-system-production.up.railway.app',
+        'capacitor://localhost',
+        'ionic://localhost',
+        'http://localhost',
     ],
 
     'allowed_origins_patterns' => [],
