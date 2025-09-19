@@ -9,11 +9,13 @@ return [
     'allowed_origins' => [
         'http://localhost:5173',
         'http://127.0.0.1:5173',
-        'https://resturant-reserve.netlify.app',
-        'https://resturant-table-reservation-system-production.up.railway.app',
+        'http://localhost',
+        'https://localhost', 
         'capacitor://localhost',
         'ionic://localhost',
-        'http://localhost',
+        'https://resturant-reserve.netlify.app',
+        'https://resturant-table-reservation-system-production.up.railway.app',
+        'https://resturant-table-reservation-system-1.onrender.com',
     ],
 
     'allowed_origins_patterns' => [],
