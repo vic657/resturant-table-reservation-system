@@ -648,7 +648,7 @@ footer a:hover {
 @media (max-width: 768px) {
   nav ul {
     display: flex;          /* keep showing links */
-    flex-direction: column; /* stack vertically if you prefer */
+    
     gap: 0.5rem;            /* tighter spacing */
   }
 
