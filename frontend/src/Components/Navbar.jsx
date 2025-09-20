@@ -39,27 +39,13 @@ export default function Navbar() {
   return (
     <>
       <nav className="navbar">
-        <h1 className="navbar-logo">VC'RestaurantSystem</h1>
-        <ul className="navbar-links">
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/menu">Menu</Link></li>
-          <li>
-            <button
-              onClick={() => scrollToSection("about")}
-              className="navbar-link-btn"
-            >
-              About
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="navbar-link-btn"
-            >
-              Contact
-            </button>
-          </li>
-        </ul>
+  <h1 className="navbar-logo">VC'RestaurantSystem</h1>
+  <ul className="navbar-links">
+    <li><Link to="/">Home</Link></li>
+    <li><Link to="/menu">Menu</Link></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
 
         {!user ? (
           <button className="navbar-btn" onClick={() => setIsLoginOpen(true)}>

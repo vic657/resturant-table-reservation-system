@@ -2,9 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FaUsers,
-  FaList,
-  FaCog,
-  FaSignOutAlt,
   FaHome,
   FaAngleDown,
   FaAngleRight,
@@ -18,6 +15,7 @@ export default function Sidebar({ onLogout }) {
 
   const toggleSupport = () => setIsSupportOpen(!isSupportOpen);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
     <>
@@ -26,11 +24,12 @@ export default function Sidebar({ onLogout }) {
         <FaBars />
       </button>
 
+      {/* Sidebar */}
       <div className={`sidebar ${isSidebarOpen ? "active" : ""}`}>
         <h2 className="sidebar-logo">Admin Panel</h2>
         <ul className="sidebar-links">
           <li>
-            <Link to="/admin/dashboard">
+            <Link to="/admin/dashboard" onClick={closeSidebar}>
               <FaHome /> Dashboard
             </Link>
           </li>
@@ -44,27 +43,33 @@ export default function Sidebar({ onLogout }) {
             {isSupportOpen && (
               <ul className="sidebar-submenu">
                 <li>
-                  <Link to="/waiters">
+                  <Link to="/waiters" onClick={closeSidebar}>
                     Waiters
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/security">Security</Link>
+                  <Link to="/admin/security" onClick={closeSidebar}>
+                    Security
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/admin/accountant">Accountant</Link>
+                  <Link to="/admin/accountant" onClick={closeSidebar}>
+                    Accountant
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/admin/kitchen-manager">Kitchen Manager</Link>
+                  <Link to="/admin/kitchen-manager" onClick={closeSidebar}>
+                    Kitchen Manager
+                  </Link>
                 </li>
               </ul>
             )}
           </li>
-
-          
         </ul>
-        
       </div>
+
+      {/* Overlay for mobile (click to close sidebar) */}
+      {isSidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
     </>
   );
 }
