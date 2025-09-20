@@ -4,20 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class MenuController extends Controller
 {
     // Fetch all menu items
     public function index()
     {
-        $menus = Menu::all()->map(function ($menu) {
-            if ($menu->image) {
-                $menu->image = asset('storage/' . $menu->image); // converts to full URL
-            }
-            return $menu;
-        });
-
+        $menus = Menu::all();
         return response()->json($menus);
     }
 
@@ -35,17 +29,16 @@ class MenuController extends Controller
         $data = $request->only(['name', 'category', 'price', 'description']);
 
         if ($request->hasFile('image')) {
-            // store in storage/app/public/menu_images
-            $path = $request->file('image')->store('menu_images', 'public');
-            $data['image'] = $path;
+            $uploaded = Cloudinary::upload(
+                $request->file('image')->getRealPath(),
+                ['folder' => 'menu_images']
+            );
+
+            $data['image'] = $uploaded->getSecurePath(); // save URL
+            $data['image_public_id'] = $uploaded->getPublicId(); // save for deletion
         }
 
         $menu = Menu::create($data);
-
-        if ($menu->image) {
-            $menu->image = asset('storage/' . $menu->image); // return full URL
-        }
-
         return response()->json($menu, 201);
     }
 
@@ -63,34 +56,33 @@ class MenuController extends Controller
         $data = $request->only(['name', 'category', 'price', 'description']);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($menu->image && Storage::disk('public')->exists($menu->image)) {
-                Storage::disk('public')->delete($menu->image);
+            // Delete old image from Cloudinary if it exists
+            if ($menu->image_public_id) {
+                Cloudinary::destroy($menu->image_public_id);
             }
 
-            $path = $request->file('image')->store('menu_images', 'public');
-            $data['image'] = $path;
+            $uploaded = Cloudinary::upload(
+                $request->file('image')->getRealPath(),
+                ['folder' => 'menu_images']
+            );
+
+            $data['image'] = $uploaded->getSecurePath();
+            $data['image_public_id'] = $uploaded->getPublicId();
         }
 
         $menu->update($data);
-
-        if ($menu->image) {
-            $menu->image = asset('storage/' . $menu->image); // return full URL
-        }
-
         return response()->json($menu);
     }
 
     // Delete a menu
     public function destroy(Menu $menu)
     {
-        // Delete the image file if exists
-        if ($menu->image && Storage::disk('public')->exists($menu->image)) {
-            Storage::disk('public')->delete($menu->image);
+        // Delete the image from Cloudinary if exists
+        if ($menu->image_public_id) {
+            Cloudinary::destroy($menu->image_public_id);
         }
 
         $menu->delete();
-
         return response()->json(['message' => 'Menu deleted successfully']);
     }
 }
