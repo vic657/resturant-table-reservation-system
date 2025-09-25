@@ -25,18 +25,29 @@ export default function KitchenManagerDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // ===== Fetch menus =====
-  const fetchMenus = async () => {
-    try {
-      const res = await axiosClient.get("/menus");
-      if (Array.isArray(res.data)) setMenus(res.data);
-      else if (res.data && Array.isArray(res.data.data)) setMenus(res.data.data);
-      else setMenus([]);
-    } catch (err) {
-      console.error("Failed to fetch menus:", err);
+ const fetchMenus = async () => {
+  try {
+    const res = await axiosClient.get("/menus");
+    if (Array.isArray(res.data)) {
+      // Optional: add a thumbnail version for faster loading
+      const menusWithThumbs = res.data.map(menu => {
+        if (menu.image) {
+          // Example: resize to 150x150 using ImageKit URL parameters
+          menu.thumbnail = `${menu.image}?tr=w-150,h-150`;
+        } else {
+          menu.thumbnail = null;
+        }
+        return menu;
+      });
+      setMenus(menusWithThumbs);
+    } else {
       setMenus([]);
     }
-  };
-
+  } catch (err) {
+    console.error("Failed to fetch menus:", err);
+    setMenus([]);
+  }
+};
   // ===== Fetch orders =====
   const fetchOrders = async () => {
     try {
@@ -236,7 +247,15 @@ export default function KitchenManagerDashboard() {
                       menus.map((menu) => (
                         <tr key={menu.id}>
                           <td>{menu.id}</td>
-                          <td>{menu.image ? <img src={menu.image} alt={menu.name} /> : "No Image"}</td>
+                          <td>
+                            {menu.image ? (
+                              <img src={menu.image} alt={menu.name} style={{ width: 80, height: 80 }} />
+                            ) : (
+                              "No Image"
+                            )}
+                          </td>
+
+
                           <td>{menu.name}</td>
                           <td>{menu.category}</td>
                           <td>{menu.description}</td>

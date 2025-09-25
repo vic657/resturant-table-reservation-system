@@ -10,7 +10,7 @@ export default function Menu() {
   const [search, setSearch] = useState("");
   const [selectedItems, setSelectedItems] = useState({});
   const [message, setMessage] = useState(null);
-  const [cartOpen, setCartOpen] = useState(false); // ✅ toggle cart
+  const [cartOpen, setCartOpen] = useState(false);
   const navigate = useNavigate();
 
   // Fetch menus from API (public endpoint)
@@ -38,7 +38,6 @@ export default function Menu() {
   // Filtering logic
   useEffect(() => {
     let filtered = menus;
-
     if (category !== "all") {
       filtered = filtered.filter((menu) => menu.category === category);
     }
@@ -55,7 +54,7 @@ export default function Menu() {
     setSelectedItems((prev) => {
       if (value <= 0) {
         const updated = { ...prev };
-        delete updated[menuId]; // remove item if 0
+        delete updated[menuId];
         return updated;
       }
       return {
@@ -74,59 +73,57 @@ export default function Menu() {
   };
 
   // Handle confirm order
-  // Handle confirm order
-const handleConfirmOrder = async () => {
-  const pendingBooking = JSON.parse(localStorage.getItem("pendingBooking"));
+  const handleConfirmOrder = async () => {
+    const pendingBooking = JSON.parse(localStorage.getItem("pendingBooking"));
 
-  if (!pendingBooking) {
-    setMessage({ type: "error", text: "No booking found. Please book a table first." });
-    navigate("/book-table");
-    return;
-  }
+    if (!pendingBooking) {
+      setMessage({
+        type: "error",
+        text: "No booking found. Please book a table first.",
+      });
+      navigate("/book-table");
+      return;
+    }
 
-  const orderItems = Object.keys(selectedItems)
-    .map((id) => {
-      const menu = menus.find((m) => m.id === parseInt(id));
-      return menu && selectedItems[id].quantity > 0
-        ? {
-            menu_id: menu.id,
-            name: menu.name,
-            price: menu.price,
-            quantity: selectedItems[id].quantity,
-          }
-        : null;
-    })
-    .filter(Boolean);
+    const orderItems = Object.keys(selectedItems)
+      .map((id) => {
+        const menu = menus.find((m) => m.id === parseInt(id));
+        return menu && selectedItems[id].quantity > 0
+          ? {
+              menu_id: menu.id,
+              name: menu.name,
+              price: menu.price,
+              quantity: selectedItems[id].quantity,
+            }
+          : null;
+      })
+      .filter(Boolean);
 
-  if (orderItems.length === 0) {
-    setMessage({ type: "error", text: "Please select at least one item." });
-    return;
-  }
+    if (orderItems.length === 0) {
+      setMessage({ type: "error", text: "Please select at least one item." });
+      return;
+    }
 
-  try {
-    // ✅ Send correctly structured payload
-    const res = await axiosClient.post("/bookings", {
-      name: pendingBooking.customer.name,
-      email: pendingBooking.customer.email,
-      phone: pendingBooking.customer.phone,
-      guests: pendingBooking.customer.guests,
-      date: pendingBooking.customer.date,
-      time: pendingBooking.customer.time,
-      tables: pendingBooking.tables, // ✅ include selected tables
-      orders: orderItems,
-    });
+    try {
+      const res = await axiosClient.post("/bookings", {
+        name: pendingBooking.customer.name,
+        email: pendingBooking.customer.email,
+        phone: pendingBooking.customer.phone,
+        guests: pendingBooking.customer.guests,
+        date: pendingBooking.customer.date,
+        time: pendingBooking.customer.time,
+        tables: pendingBooking.tables,
+        orders: orderItems,
+      });
 
-    const { receipt_code } = res.data;
-
-    localStorage.removeItem("pendingBooking");
-
-    navigate(`/receipt/${receipt_code}`);
-  } catch (err) {
-    console.error("Failed to confirm order:", err.response?.data || err.message);
-    setMessage({ type: "error", text: "Failed to place order. Try again." });
-  }
-};
-
+      const { receipt_code } = res.data;
+      localStorage.removeItem("pendingBooking");
+      navigate(`/receipt/${receipt_code}`);
+    } catch (err) {
+      console.error("Failed to confirm order:", err.response?.data || err.message);
+      setMessage({ type: "error", text: "Failed to place order. Try again." });
+    }
+  };
 
   return (
     <div style={{ background: "#fff7ed", minHeight: "100vh" }}>
@@ -150,6 +147,7 @@ const handleConfirmOrder = async () => {
           style={{
             display: "flex",
             justifyContent: "center",
+            flexWrap: "wrap",
             gap: "20px",
             marginBottom: "30px",
           }}
@@ -184,12 +182,12 @@ const handleConfirmOrder = async () => {
           />
         </div>
 
-        {/* Menu List */}
+        {/* Menu Grid */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
             gap: "20px",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
           }}
         >
           {filteredMenus.length > 0 ? (
@@ -235,25 +233,17 @@ const handleConfirmOrder = async () => {
                     No Image
                   </div>
                 )}
-                <h3
-                  style={{ fontSize: "18px", fontWeight: "bold", color: "#b91c1c" }}
-                >
+
+                <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#b91c1c" }}>
                   {menu.name}
                 </h3>
                 <p style={{ fontSize: "14px", margin: "8px 0", color: "#555" }}>
                   {menu.description}
                 </p>
-                <p
-                  style={{
-                    fontWeight: "bold",
-                    color: "#b91c1c",
-                    fontSize: "16px",
-                  }}
-                >
+                <p style={{ fontWeight: "bold", color: "#b91c1c", fontSize: "16px" }}>
                   Ksh {menu.price}
                 </p>
 
-                {/* Quantity only shows if selected */}
                 <div style={{ marginTop: "10px" }}>
                   <input
                     type="number"
@@ -282,103 +272,99 @@ const handleConfirmOrder = async () => {
         </div>
 
         {/* Floating Cart Toggle */}
-{Object.keys(selectedItems).length > 0 && (
-  <div
-    style={{
-      position: "fixed",
-      bottom: "20px",
-      right: "20px",
-      background: "#fff",
-      border: "1px solid #facc15",
-      borderRadius: "10px",
-      padding: "15px",
-      boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-      width: cartOpen ? "320px" : "auto",
-      zIndex: 999,
-    }}
-  >
-    <button
-      onClick={() => setCartOpen(!cartOpen)}
-      style={{
-        background: "#ea580c",
-        color: "white",
-        padding: "8px 15px",
-        border: "none",
-        borderRadius: "8px",
-        cursor: "pointer",
-      }}
-    >
-      {cartOpen ? "Hide Cart" : `Cart (${Object.keys(selectedItems).length})`}
-    </button>
-
-    {cartOpen && (
-      <div style={{ marginTop: "15px" }}>
-        {Object.keys(selectedItems).map((id) => {
-          const menu = menus.find((m) => m.id === parseInt(id));
-          return (
-            <div
-              key={id}
+        {Object.keys(selectedItems).length > 0 && (
+          <div
+            style={{
+              position: "fixed",
+              bottom: "20px",
+              right: "20px",
+              background: "#fff",
+              border: "1px solid #facc15",
+              borderRadius: "10px",
+              padding: "15px",
+              boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+              width: cartOpen ? "320px" : "auto",
+              zIndex: 999,
+            }}
+          >
+            <button
+              onClick={() => setCartOpen(!cartOpen)}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "10px",
+                background: "#ea580c",
+                color: "white",
+                padding: "8px 15px",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
               }}
             >
-              <div>
-                <strong>{menu?.name}</strong> x {selectedItems[id].quantity}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>Ksh {menu?.price * selectedItems[id].quantity}</span>
-                {/* ✅ Remove Button */}
+              {cartOpen ? "Hide Cart" : `Cart (${Object.keys(selectedItems).length})`}
+            </button>
+
+            {cartOpen && (
+              <div style={{ marginTop: "15px" }}>
+                {Object.keys(selectedItems).map((id) => {
+                  const menu = menus.find((m) => m.id === parseInt(id));
+                  return (
+                    <div
+                      key={id}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <div>
+                        <strong>{menu?.name}</strong> x {selectedItems[id].quantity}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span>Ksh {menu?.price * selectedItems[id].quantity}</span>
+                        <button
+                          onClick={() => {
+                            setSelectedItems((prev) => {
+                              const updated = { ...prev };
+                              delete updated[id];
+                              return updated;
+                            });
+                          }}
+                          style={{
+                            background: "#dc2626",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            padding: "4px 8px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                <hr />
+                <h3 style={{ marginTop: "10px" }}>Total: Ksh {calculateTotal()}</h3>
                 <button
-                  onClick={() => {
-                    setSelectedItems((prev) => {
-                      const updated = { ...prev };
-                      delete updated[id];
-                      return updated;
-                    });
-                  }}
+                  onClick={handleConfirmOrder}
                   style={{
-                    background: "#dc2626",
+                    marginTop: "10px",
+                    width: "100%",
+                    background: "#16a34a",
                     color: "white",
+                    padding: "10px",
                     border: "none",
-                    borderRadius: "4px",
-                    padding: "4px 8px",
+                    borderRadius: "6px",
                     cursor: "pointer",
-                    fontSize: "12px",
                   }}
                 >
-                  Remove
+                  Confirm Order
                 </button>
               </div>
-            </div>
-          );
-        })}
-        <hr />
-        <h3 style={{ marginTop: "10px" }}>
-          Total: Ksh {calculateTotal()}
-        </h3>
-        <button
-          onClick={handleConfirmOrder}
-          style={{
-            marginTop: "10px",
-            width: "100%",
-            background: "#16a34a",
-            color: "white",
-            padding: "10px",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Confirm Order
-        </button>
-      </div>
-    )}
-  </div>
-)}
-
+            )}
+          </div>
+        )}
 
         {/* Message */}
         {message && (
@@ -389,10 +375,7 @@ const handleConfirmOrder = async () => {
               borderRadius: "6px",
               textAlign: "center",
               color: message.type === "success" ? "green" : "red",
-              background:
-                message.type === "success"
-                  ? "rgba(0,128,0,0.1)"
-                  : "rgba(255,0,0,0.1)",
+              background: message.type === "success" ? "rgba(0,128,0,0.1)" : "rgba(255,0,0,0.1)",
             }}
           >
             {message.text}

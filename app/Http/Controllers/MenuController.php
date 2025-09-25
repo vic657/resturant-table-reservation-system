@@ -4,18 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use ImageKit\ImageKit;
+use Illuminate\Support\Facades\Log;
 
 class MenuController extends Controller
 {
+    protected $imageKit;
+
+    public function __construct()
+    {
+        $this->imageKit = new ImageKit(
+            config('app.imagekit.public_key'),
+            config('app.imagekit.private_key'),
+            config('app.imagekit.url_endpoint')
+        );
+    }
+
     // Fetch all menu items
     public function index()
     {
         $menus = Menu::all()->map(function ($menu) {
-            if ($menu->image) {
-                $menu->image = asset('storage/' . $menu->image); // converts to full URL
-            }
-            return $menu;
+            return [
+                'id'          => $menu->id,
+                'name'        => $menu->name,
+                'category'    => $menu->category,
+                'price'       => $menu->price,
+                'description' => $menu->description,
+                'image'       => $menu->image,
+                'created_at'  => $menu->created_at,
+                'updated_at'  => $menu->updated_at,
+            ];
         });
 
         return response()->json($menus);
@@ -35,18 +53,41 @@ class MenuController extends Controller
         $data = $request->only(['name', 'category', 'price', 'description']);
 
         if ($request->hasFile('image')) {
-            // store in storage/app/public/menu_images
-            $path = $request->file('image')->store('menu_images', 'public');
-            $data['image'] = $path;
+            $file     = fopen($request->file('image')->getPathname(), "r");
+            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
+
+            $upload = $this->imageKit->upload([
+                'file'              => $file,
+                'fileName'          => $fileName,
+                'folder'            => "/menu_images",
+                'useUniqueFileName' => true,
+            ]);
+
+            // Decode nested stdClass to array
+            $response = json_decode(json_encode($upload->result), true);
+
+
+            if (isset($response['url'])) {
+            $data['image'] = $response['url'];
+            $data['image_file_id'] = $response['fileId'] ?? null;
+        } else {
+            Log::warning('ImageKit upload succeeded but no URL found in decoded result.', $response);
+        }
+
         }
 
         $menu = Menu::create($data);
 
-        if ($menu->image) {
-            $menu->image = asset('storage/' . $menu->image); // return full URL
-        }
-
-        return response()->json($menu, 201);
+        return response()->json([
+            'id'          => $menu->id,
+            'name'        => $menu->name,
+            'category'    => $menu->category,
+            'price'       => $menu->price,
+            'description' => $menu->description,
+            'image'       => $menu->image,
+            'created_at'  => $menu->created_at,
+            'updated_at'  => $menu->updated_at,
+        ], 201);
     }
 
     // Update an existing menu
@@ -63,30 +104,47 @@ class MenuController extends Controller
         $data = $request->only(['name', 'category', 'price', 'description']);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($menu->image && Storage::disk('public')->exists($menu->image)) {
-                Storage::disk('public')->delete($menu->image);
-            }
+            $file     = fopen($request->file('image')->getPathname(), "r");
+            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
 
-            $path = $request->file('image')->store('menu_images', 'public');
-            $data['image'] = $path;
+            $upload = $this->imageKit->upload([
+            'file'              => $file,
+            'fileName'          => $fileName,
+            'folder'            => "/menu_images",
+            'useUniqueFileName' => true,
+        ]);
+
+        if (isset($upload->result->url)) {
+            $data['image'] = $upload->result->url;
+            $data['image_file_id'] = $upload->result->fileId ?? null;
+        } else {
+            Log::warning('ImageKit upload succeeded but no URL found.', (array) $upload->result);
+        }
         }
 
         $menu->update($data);
 
-        if ($menu->image) {
-            $menu->image = asset('storage/' . $menu->image); // return full URL
-        }
-
-        return response()->json($menu);
+        return response()->json([
+            'id'          => $menu->id,
+            'name'        => $menu->name,
+            'category'    => $menu->category,
+            'price'       => $menu->price,
+            'description' => $menu->description,
+            'image'       => $menu->image,
+            'created_at'  => $menu->created_at,
+            'updated_at'  => $menu->updated_at,
+        ]);
     }
 
     // Delete a menu
     public function destroy(Menu $menu)
     {
-        // Delete the image file if exists
-        if ($menu->image && Storage::disk('public')->exists($menu->image)) {
-            Storage::disk('public')->delete($menu->image);
+        if ($menu->image_file_id) {
+            try {
+                $this->imageKit->deleteFile($menu->image_file_id);
+            } catch (\Exception $e) {
+                Log::error('Failed to delete image from ImageKit: ' . $e->getMessage());
+            }
         }
 
         $menu->delete();
