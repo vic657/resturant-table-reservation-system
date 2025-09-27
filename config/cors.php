@@ -4,23 +4,30 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
     'allowed_origins' => [
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://localhost',
-        'https://localhost', 
+        
+
+        //  Production web frontend
+        'https://resturant-reserve.netlify.app',
+        'https://resturant-table-reservation-system-1.onrender.com',
+
+        //  Mobile apps (Capacitor / Ionic)
         'capacitor://localhost',
         'ionic://localhost',
-        'https://resturant-reserve.netlify.app',
-        'https://resturant-table-reservation-system-production.up.railway.app',
-        'https://resturant-table-reservation-system-1.onrender.com',
     ],
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => [
+        'Content-Type',
+        'X-Requested-With',
+        'Accept',
+        'Origin',
+        'Authorization',
+        'X-CSRF-TOKEN',
+    ],
 
     'exposed_headers' => [],
 
