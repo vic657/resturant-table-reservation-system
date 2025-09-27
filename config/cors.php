@@ -16,6 +16,7 @@ return [
         //  Mobile apps (Capacitor / Ionic)
         'capacitor://localhost',
         'ionic://localhost',
+        'https://localhost',
     ],
 
     'allowed_origins_patterns' => [],
