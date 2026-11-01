@@ -9,3 +9,11 @@ storage/framework/cache/*
 storage/framework/sessions/*
 storage/framework/views/*
 vendor
+
+frontend/node_modules
+frontend/dist
+frontend/.env*
+frontend/android
+frontend/ios
+.env.*
+!.env.example

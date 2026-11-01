@@ -1,0 +1,22 @@
+name: Check app and database
+on:
+  schedule:
+    - cron: '3-58/5 * * * *'
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: restaurant-health
+  cancel-in-progress: false
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      HEALTH_URL: ${{ vars.APP_HEALTH_URL || 'https://resturant-table-reservation-system-1.onrender.com/health' }}
+    steps:
+      - name: Check Render and Railway
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --retry 2 --retry-delay 10 --retry-all-errors \
+            --connect-timeout 15 --max-time 60 \
+            --header 'Cache-Control: no-cache' "$HEALTH_URL"

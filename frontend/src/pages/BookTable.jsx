@@ -9,6 +9,8 @@ export default function BookTable() {
   const [area, setArea] = useState("indoor");
   const [selectedTables, setSelectedTables] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [checkingTables, setCheckingTables] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState(false);
   const [bookedTables, setBookedTables] = useState([]); // ✅ store booked tables
   const [formData, setFormData] = useState({
     name: "",
@@ -23,19 +25,18 @@ export default function BookTable() {
   const indoorTables = Array.from({ length: 10 }, (_, i) => i + 1);
   const outdoorTables = Array.from({ length: 10 }, (_, i) => i + 1);
 
-  // ✅ Fetch booked tables when date changes (ignore time)
   useEffect(() => {
-    if (formData.date) {
-      axiosClient
-        .post(`${import.meta.env.VITE_API_BASE_URL}/booked-tables`, { date: formData.date }) // ✅ send only date
-        .then((res) => setBookedTables(res.data))
-        .catch((err) => {
-          console.error("Error fetching booked tables:", err);
-          setBookedTables([]);
-        });
-    } else {
-      setBookedTables([]);
-    }
+    let active = true;
+    setSelectedTables([]);
+    setAvailabilityError(false);
+    setBookedTables([]);
+    if (!formData.date) { setCheckingTables(false); return; }
+    setCheckingTables(true);
+    axiosClient.post('/booked-tables', { date: formData.date })
+      .then(res => { if (active) setBookedTables(res.data); })
+      .catch(() => { if (active) { setAvailabilityError(true); setMessage({ type: 'error', text: 'Unable to check table availability. Please select the date again.' }); } })
+      .finally(() => { if (active) setCheckingTables(false); });
+    return () => { active = false; };
   }, [formData.date]);
 
   const toggleTable = (type, number) => {
@@ -43,6 +44,8 @@ export default function BookTable() {
       setMessage({ type: "error", text: "Please select a date first." });
       return;
     }
+    if (checkingTables || availabilityError) return;
+    setMessage(null);
     const key = `${type}-${number}`;
 
     // Prevent selecting already booked tables
@@ -57,7 +60,7 @@ export default function BookTable() {
   };
 
   const handleBookClick = () => {
-    if (selectedTables.length === 0) {
+    if (checkingTables || availabilityError || selectedTables.length === 0) {
       setMessage({ type: "error", text: "Please select at least one table." });
       return;
     }
@@ -72,6 +75,9 @@ export default function BookTable() {
   };
 
   const confirmBooking = () => {
+    if (!selectedTables.length || checkingTables || availabilityError) {
+      setShowForm(false); setMessage({ type: "error", text: "Please select your table for this date before continuing." }); return;
+    }
     if (
       !formData.name ||
       !formData.email ||
@@ -126,7 +132,7 @@ export default function BookTable() {
       >
         <input
           type="date"
-          name="date"
+          aria-label="Booking date" name="date"
           value={formData.date || ""}
           onChange={handleChange}
           style={{
@@ -138,7 +144,7 @@ export default function BookTable() {
         />
         <input
           type="time"
-          name="time"
+          aria-label="Booking time" name="time"
           value={formData.time || ""}
           onChange={handleChange}
           style={{
@@ -155,6 +161,7 @@ export default function BookTable() {
         </p>
       )}
 
+      {checkingTables && <p role="status">Checking table availability…</p>}
       {/* Area selection */}
       <div className="area-selection">
         <button
@@ -191,6 +198,8 @@ export default function BookTable() {
                     className={`room-table 
                       ${isSelected ? "selected" : ""} 
                       ${isBooked ? "booked" : ""}`}
+                    role="button" tabIndex={isBooked ? -1 : 0} aria-disabled={isBooked || checkingTables || availabilityError} aria-pressed={isSelected} aria-label={`indoor table ${num}`}
+                    onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleTable("indoor", num); } }}
                     onClick={() => toggleTable("indoor", num)}
                   >
                     <span className="chair top" />
@@ -231,6 +240,8 @@ export default function BookTable() {
                     className={`garden-table table-${num} 
                       ${isSelected ? "selected" : ""} 
                       ${isBooked ? "booked" : ""}`}
+                    role="button" tabIndex={isBooked ? -1 : 0} aria-disabled={isBooked || checkingTables || availabilityError} aria-pressed={isSelected} aria-label={`outdoor table ${num}`}
+                    onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleTable("outdoor", num); } }}
                     onClick={() => toggleTable("outdoor", num)}
                   >
                     <span className="chair top" />
@@ -247,7 +258,7 @@ export default function BookTable() {
       )}
 
       <div className="controls">
-        <button className="confirm-btn" onClick={handleBookClick}>
+        <button className="confirm-btn" disabled={checkingTables || availabilityError} onClick={handleBookClick}>
           {selectedTables.length > 1
             ? "Book Tables"
             : selectedTables.length === 1
@@ -302,6 +313,8 @@ export default function BookTable() {
               padding: "25px",
               borderRadius: "12px",
               width: "400px",
+              maxHeight: "calc(100dvh - 40px)",
+              overflowY: "auto",
               maxWidth: "90%",
               textAlign: "center",
               boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
@@ -312,7 +325,7 @@ export default function BookTable() {
             </h3>
             <input
               type="text"
-              name="name"
+              aria-label="Booking name" name="name"
               placeholder="Your Name"
               value={formData.name}
               onChange={handleChange}
@@ -326,7 +339,7 @@ export default function BookTable() {
             />
             <input
               type="email"
-              name="email"
+              aria-label="Booking email" name="email"
               placeholder="Your Email"
               value={formData.email}
               onChange={handleChange}
@@ -340,7 +353,7 @@ export default function BookTable() {
             />
             <input
               type="text"
-              name="phone"
+              aria-label="Booking phone" name="phone"
               placeholder="Phone Number"
               value={formData.phone}
               onChange={handleChange}
@@ -354,7 +367,7 @@ export default function BookTable() {
             />
             <input
               type="number"
-              name="guests"
+              aria-label="Booking guests" name="guests"
               placeholder="Number of Guests"
               value={formData.guests}
               onChange={handleChange}
@@ -368,7 +381,7 @@ export default function BookTable() {
             />
             <input
               type="date"
-              name="date"
+              aria-label="Booking date" name="date"
               placeholder="Booking Date"
               value={formData.date || ""}
               onChange={handleChange}
@@ -382,7 +395,7 @@ export default function BookTable() {
             />
             <input
               type="time"
-              name="time"
+              aria-label="Booking time" name="time"
               placeholder="Booking Time"
               value={formData.time || ""}
               onChange={handleChange}

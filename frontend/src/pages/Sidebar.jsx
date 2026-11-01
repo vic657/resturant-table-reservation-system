@@ -20,7 +20,7 @@ export default function Sidebar({ onLogout }) {
   return (
     <>
       {/* Mobile toggle button */}
-      <button className="toggle-btn" onClick={toggleSidebar}>
+      <button className="toggle-btn" aria-label="Toggle staff navigation" aria-expanded={isSidebarOpen} onClick={toggleSidebar}>
         <FaBars />
       </button>
 

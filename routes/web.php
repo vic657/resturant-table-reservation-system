@@ -1,11 +1,16 @@
 <?php
+use Illuminate\Support\Facades\{DB, File, Route};
 
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Route;
+Route::get('/health', function () {
+    try {
+        DB::select('SELECT 1');
+        return response()->json(['status' => 'ok'], 200, ['Cache-Control' => 'no-store']);
+    } catch (\Throwable $e) {
+        return response()->json(['status' => 'unavailable'], 503, ['Cache-Control' => 'no-store']);
+    }
+})->middleware('throttle:30,1');
 
-Route::get('/health', fn() => response()->json(['status' => 'ok']));
-
-// Catch-all route (for React build)
-Route::get('/{any}', function () {
-    return File::get(public_path('index.html'));
-})->where('any', '.*');
+// Unknown API endpoints should return JSON instead of the React shell.
+Route::any('/api/{path?}', fn () => response()->json(['message' => 'Not found.'], 404))->where('path', '.*');
+Route::get('/{any}', fn () => response(File::get(public_path('index.html')))->header('Cache-Control', 'no-cache'))
+    ->where('any', '.*');

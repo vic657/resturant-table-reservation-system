@@ -1,31 +1,38 @@
 services:
   - type: web
     name: laravel-app
-    env: docker
+    runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_KEY
-        value: base64:WtLWj6IeBgAmEfFYEZYuTrycrz7qmH3GB92nOTugyJw=
+        sync: false
+      - key: APP_URL
+        sync: false
       - key: APP_DEBUG
         value: false
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
-        value: caboose.proxy.rlwy.net
+        sync: false
       - key: DB_PORT
-        value: 19577
+        sync: false
       - key: DB_DATABASE
-        value: railway
+        sync: false
       - key: DB_USERNAME
-        value: root
+        sync: false
       - key: DB_PASSWORD
         sync: false
-      - key: CACHE_DRIVER
+      - key: CACHE_STORE
         value: file
       - key: SESSION_DRIVER
         value: file
+      - key: SESSION_SECURE_COOKIE
+        value: true
       - key: QUEUE_CONNECTION
         value: sync
+      - key: RUN_MIGRATIONS
+        value: false

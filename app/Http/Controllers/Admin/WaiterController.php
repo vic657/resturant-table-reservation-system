@@ -80,7 +80,10 @@ class WaiterController extends Controller
     }
     public function getOrders($waiterId)
 {
-    $waiter = Waiter::find($waiterId);
+    if (request()->user() instanceof Waiter) {
+        abort_unless((string) request()->user()->id === (string) $waiterId, 403);
+    }
+        $waiter = Waiter::find($waiterId);
 
     if (!$waiter) {
         return response()->json(['message' => 'Waiter not found'], 404);

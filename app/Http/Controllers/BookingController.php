@@ -77,9 +77,10 @@ class BookingController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            report($e);
             return response()->json([
                 'message' => 'Booking failed',
-                'error'   => $e->getMessage(),
+
             ], 500);
         }
     }

@@ -4,6 +4,9 @@ import Navbar from "../Components/Navbar";
 import { useNavigate } from "react-router-dom";
 
 export default function Menu() {
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [menus, setMenus] = useState([]);
   const [filteredMenus, setFilteredMenus] = useState([]);
   const [category, setCategory] = useState("all");
@@ -15,6 +18,7 @@ export default function Menu() {
 
   // Fetch menus from API (public endpoint)
   const fetchMenus = async () => {
+    setLoading(true); setLoadError(false);
     try {
       const res = await axiosClient.get("/menu-show");
       if (Array.isArray(res.data)) {
@@ -25,10 +29,10 @@ export default function Menu() {
         setFilteredMenus([]);
       }
     } catch (err) {
-      console.error("Failed to fetch menus:", err);
+      setLoadError(true);
       setMenus([]);
       setFilteredMenus([]);
-    }
+    } finally { setLoading(false); }
   };
 
   useEffect(() => {
@@ -74,7 +78,9 @@ export default function Menu() {
 
   // Handle confirm order
   const handleConfirmOrder = async () => {
-    const pendingBooking = JSON.parse(localStorage.getItem("pendingBooking"));
+    if (submitting) return;
+    let pendingBooking;
+    try { pendingBooking = JSON.parse(localStorage.getItem("pendingBooking")); } catch { localStorage.removeItem("pendingBooking"); }
 
     if (!pendingBooking) {
       setMessage({
@@ -105,6 +111,7 @@ export default function Menu() {
     }
 
     try {
+      setSubmitting(true);
       const res = await axiosClient.post("/bookings", {
         name: pendingBooking.customer.name,
         email: pendingBooking.customer.email,
@@ -121,20 +128,22 @@ export default function Menu() {
       navigate(`/receipt/${receipt_code}`);
     } catch (err) {
       console.error("Failed to confirm order:", err.response?.data || err.message);
-      setMessage({ type: "error", text: "Failed to place order. Try again." });
+      setMessage({ type: "error", text: err.response?.data?.message || "Failed to place order. Try again." });
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div style={{ background: "#fff7ed", minHeight: "100vh" }}>
+    <div style={{ background: "var(--paper)", minHeight: "100vh" }}>
       <Navbar />
 
-      <div style={{ padding: "20px" }}>
+      <div className="public-menu-content" style={{ padding: "20px" }}>
         <h1
           style={{
             fontSize: "28px",
             fontWeight: "bold",
-            color: "#b91c1c",
+            color: "var(--ink)",
             marginBottom: "20px",
             textAlign: "center",
           }}
@@ -153,12 +162,12 @@ export default function Menu() {
           }}
         >
           <select
-            value={category}
+            aria-label="Menu category" value={category}
             onChange={(e) => setCategory(e.target.value)}
             style={{
               padding: "10px",
               borderRadius: "6px",
-              border: "1px solid #ea580c",
+              border: "1px solid var(--line)",
             }}
           >
             <option value="all">All Categories</option>
@@ -170,13 +179,13 @@ export default function Menu() {
 
           <input
             type="text"
-            placeholder="Search by name..."
+            aria-label="Search menu" placeholder="Search by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
               padding: "10px",
               borderRadius: "6px",
-              border: "1px solid #ea580c",
+              border: "1px solid var(--line)",
               width: "250px",
             }}
           />
@@ -195,7 +204,7 @@ export default function Menu() {
               <div
                 key={menu.id}
                 style={{
-                  border: "1px solid #facc15",
+                  border: "1px solid var(--line)",
                   borderRadius: "10px",
                   background: "white",
                   padding: "15px",
@@ -226,7 +235,7 @@ export default function Menu() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      color: "#b91c1c",
+                      color: "var(--ink)",
                       fontWeight: "bold",
                     }}
                   >
@@ -234,13 +243,13 @@ export default function Menu() {
                   </div>
                 )}
 
-                <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#b91c1c" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "var(--ink)" }}>
                   {menu.name}
                 </h3>
                 <p style={{ fontSize: "14px", margin: "8px 0", color: "#555" }}>
                   {menu.description}
                 </p>
-                <p style={{ fontWeight: "bold", color: "#b91c1c", fontSize: "16px" }}>
+                <p style={{ fontWeight: "bold", color: "var(--ink)", fontSize: "16px" }}>
                   Ksh {menu.price}
                 </p>
 
@@ -248,7 +257,7 @@ export default function Menu() {
                   <input
                     type="number"
                     min="0"
-                    placeholder="Qty"
+                    aria-label={`Quantity for ${menu.name}`} placeholder="Qty"
                     value={selectedItems[menu.id]?.quantity || ""}
                     onChange={(e) =>
                       handleQuantityChange(menu.id, parseInt(e.target.value) || 0)
@@ -266,7 +275,8 @@ export default function Menu() {
             ))
           ) : (
             <p style={{ textAlign: "center", color: "#555", gridColumn: "1 / -1" }}>
-              No menu items found.
+              {loading ? "Loading our menu…" : loadError ? "The menu could not be loaded. Please try again." : "No menu items match your search."}
+              {loadError && <button onClick={fetchMenus}>Try again</button>}
             </p>
           )}
         </div>
@@ -279,18 +289,20 @@ export default function Menu() {
               bottom: "20px",
               right: "20px",
               background: "#fff",
-              border: "1px solid #facc15",
+              border: "1px solid var(--line)",
               borderRadius: "10px",
               padding: "15px",
               boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-              width: cartOpen ? "320px" : "auto",
+              width: cartOpen ? "min(360px, calc(100vw - 40px))" : "auto",
+              maxHeight: "calc(100dvh - 120px)",
+              overflowY: "auto",
               zIndex: 999,
             }}
           >
             <button
               onClick={() => setCartOpen(!cartOpen)}
               style={{
-                background: "#ea580c",
+                background: "var(--accent)",
                 color: "white",
                 padding: "8px 15px",
                 border: "none",
@@ -347,7 +359,7 @@ export default function Menu() {
                 <hr />
                 <h3 style={{ marginTop: "10px" }}>Total: Ksh {calculateTotal()}</h3>
                 <button
-                  onClick={handleConfirmOrder}
+                  onClick={handleConfirmOrder} disabled={submitting}
                   style={{
                     marginTop: "10px",
                     width: "100%",
@@ -359,7 +371,7 @@ export default function Menu() {
                     cursor: "pointer",
                   }}
                 >
-                  Confirm Order
+                  {submitting ? "Placing order…" : "Confirm Order"}
                 </button>
               </div>
             )}

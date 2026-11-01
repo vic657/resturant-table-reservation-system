@@ -115,6 +115,9 @@ class KitchenManagerController extends Controller
 public function markOrderServed($orderId)
 {
     $order = Order::findOrFail($orderId);
+    if (request()->user() instanceof Waiter) {
+        abort_unless((string) $order->waiter_id === (string) request()->user()->id, 403, 'This order is not assigned to you.');
+    }
     $order->status = 'served';
     $order->save();
 
